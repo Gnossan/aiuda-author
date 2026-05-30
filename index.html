@@ -51,5 +51,10 @@
     <span>AIuda Author™</span>
   </div>
   <footer>© 2026 Tomas Hultberg · <a href="https://aiuda.se/privacy.html" style="color:inherit;">Privacy policy</a></footer>
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/sw.js');
+    }
+  </script>
 </body>
 </html>
