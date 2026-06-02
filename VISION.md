@@ -1,0 +1,106 @@
+# AIuda Author™ — Produktvision
+
+**Datum:** 2026-06-01  
+**Status:** Tidig utveckling
+
+---
+
+## Kärnfilosofi
+
+**AI stödjer tänkandet — ersätter det inte.**
+
+AIuda Author är designat för att lärare och kursledare ska *tillåta* studenter att använda det. Det innebär att AI aldrig genererar löpande text. Studenten skriver själv. AI hjälper med struktur, feedback och de mekaniska delarna av skrivprocesset.
+
+---
+
+## Vad AI får göra
+
+### ✅ Disposition
+Baserat på research-frågan och källorna från Mentor analyserar AI och föreslår en möjlig struktur — rubriker, avsnitt, logisk ordning. Studenten beslutar vad de vill använda.
+
+### ✅ Skrivtips och feedback
+AI kommenterar det studenten skrivit:
+- "Det här avsnittet saknar ett konkret exempel"
+- "Argumentet är inte underbyggt"
+- "Röda tråden tappas här"
+- Ställer motfrågor: "Har du övervägt X-perspektivet?"
+
+AI genererar *aldrig* ersättningstext — bara frågor och kommentarer.
+
+### ✅ Idéer och förslag
+AI kan lyfta fram vinklar och perspektiv som kanske inte täcks, baserat på research. Studenten väljer om och hur de vill använda dem.
+
+### ✅ Notapparat och fotnoter
+AI formaterar fotnoter korrekt utifrån vald referensstil. Kan föreslå var i texten en fotnot borde sitta — men studenten skriver vad fotnoten ska säga.
+
+### ✅ Litteraturlista
+AI genererar automatisk litteraturlista från källloggen i Mentor i vald stil:
+- APA
+- Chicago
+- Harvard
+- Vancouver
+- Oxford
+
+Källloggen i Mentor → formaterad litteraturlista i Author.
+
+---
+
+## Vad AI inte får göra
+
+### ❌ Generera löpande text
+AI skriver inte meningar, stycken eller avsnitt åt studenten.
+
+### ❌ Omformulera studentens text
+AI föreslår inte alternativa formuleringar — det är studentens röst.
+
+---
+
+## Transparenslogg
+
+Varje AI-interaktion loggas:
+- Vilken typ av hjälp begärdes (disposition, feedback, notat)
+- Tidpunkt
+- Vad studenten faktiskt använde
+
+Läraren kan begära loggen för att se hur AI användes i uppsatsen. Det bygger förtroende och möjliggör pedagogisk uppföljning.
+
+---
+
+## Integration med Mentor
+
+- **Källlogg** → litteraturlista (automatisk, formaterad)
+- **Research-fråga** → grund för dispositionsförslag
+- **Sessionslogg** → kontext för feedback ("du har forskat om X — täcker texten det?")
+
+---
+
+## Skrivmiljö
+
+- **Hybrid editor** — Markdown-genvägar renderas direkt (som Notion)
+- **Fokusläge** — ren skrivyta utan distraktioner
+- **Framtida vyer** — disposition-vy, feedback-vy, export-vy
+
+---
+
+## Målgrupp
+
+- Gymnasie- och högskolestudenter
+- Akademiska skribenter
+- Forskare som vill gå från Mentor-research till skriven text
+- Alla kurser där läraren vill tillåta AI-stöd men inte AI-genererad text
+
+---
+
+## Export
+
+- `.md` (Markdown)
+- `.docx` (Word)
+- `.pdf`
+
+---
+
+## Vad som återstår att besluta
+
+- Betalmodell (Web Store vs Stripe)
+- Integrationsdjup med Mentor (läsrättigheter till källlogg)
+- Referenshanteringsformat per ämnesområde
