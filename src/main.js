@@ -24,6 +24,8 @@ app.innerHTML = `
           <button class="format-btn" data-format="latex">LaTeX</button>
         </div>
         <span id="word-count">0 ord</span>
+        <button id="open-btn" title="Öppna fil">↑</button>
+        <input type="file" id="file-input" accept=".md,.txt,.wiki,.tex" style="display:none">
         <button id="export-btn" title="Exportera">↓</button>
       </div>
     </header>
@@ -111,6 +113,50 @@ document.querySelectorAll('.format-btn').forEach(btn => {
 
         aktivtFormat = nyttFormat
     })
+})
+
+// Öppna fil
+document.getElementById('open-btn').addEventListener('click', () => {
+    document.getElementById('file-input').click()
+})
+
+document.getElementById('file-input').addEventListener('change', (e) => {
+    const fil = e.target.files[0]
+    if (!fil) return
+
+    const reader = new FileReader()
+    reader.onload = (ev) => {
+        const text = ev.target.result
+        const ext = fil.name.split('.').pop().toLowerCase()
+
+        // Detektera format från filtyp
+        const format = ext === 'tex' ? 'latex' : ext === 'wiki' ? 'wiki' : 'md'
+
+        // Sätt aktivt format
+        document.querySelectorAll('.format-btn').forEach(b => {
+            b.classList.toggle('active', b.dataset.format === format)
+        })
+        sättLäge(format)
+        aktivtFormat = format
+
+        // Ladda innehållet
+        const html = format === 'wiki' ? wikiTillHtml(text)
+                   : format === 'latex' ? latexTillHtml(text)
+                   : markdownTillHtml(text)
+
+        editor.commands.setContent(html)
+
+        // Sätt dokumenttitel från filnamn
+        const titel = fil.name.replace(/\.[^.]+$/, '')
+        document.getElementById('doc-title').value = titel
+
+        // Visa source om man föredrar det
+        if (aktivVy === 'source') {
+            sourceEl.value = text
+        }
+    }
+    reader.readAsText(fil)
+    e.target.value = '' // Tillåt att öppna samma fil igen
 })
 
 // Export
