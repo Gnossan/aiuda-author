@@ -114,8 +114,35 @@ Funktioner som inte är med i MVP men som kan läggas till vid efterfrågan:
 | Realtidssamarbete | — | Flera skriver samtidigt |
 | Mobiloptimering | — | Begränsad skrivyta, annorlunda UX |
 
+## Kryptering och nyckelhantering
+
+Author delar krypteringsnyckel med Mentor — ett lösenord för hela AIuda-ekosystemet.
+
+**Flöde vid inloggning:**
+1. Användaren loggar in med Google (Firebase Auth)
+2. Author hämtar `wrappedKey` från `users/{uid}/kryptering/nyckel` i Firebase
+3. Användaren anger sitt AIuda-lösenord → PBKDF2 härleder nyckeln
+4. Nyckeln används för att:
+   - Dekryptera Mentor-data (höger panel: projekt, sources, sammanfattningar)
+   - Kryptera Authors egna dokument vid sparning
+
+**Konsekvens:** Authors dokument är åtkomliga från valfri enhet med rätt lösenord — samma löfte som Mentor ger.
+
+## Sidpaneler
+
+### Höger panel — Mentor-integration
+- Hämtar data direkt från Firebase (ingen plugin krävs — Author är webbapp)
+- Visar: projekt, källlogg, sessionssammanfattningar från Mentor
+- Kräver att användaren anger sitt AIuda-lösenord för dekryptering
+- Fungerar som research-underlag för skrivarbetet
+
+### Vänster panel — AI-assistans
+- Skrivtips, feedback och idéer (AI genererar aldrig löpande text)
+- Dispositionsförslag baserade på Mentor-research
+- Kontextuell hjälp baserad på vad användaren skriver
+
 ## Vad som återstår att besluta
 
 - Betalmodell (Web Store vs Stripe)
-- Integrationsdjup med Mentor (läsrättigheter till källlogg)
 - Referenshanteringsformat per ämnesområde
+- Hur AI-assistansen presenteras utan att uppmuntra copy-paste
