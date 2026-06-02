@@ -137,6 +137,22 @@ Author delar krypteringsnyckel med Mentor — ett lösenord för hela AIuda-ekos
 
 ## Sidpaneler
 
+### Tvåvägsflöde — Author ↔ Mentor
+
+```
+Mentor (research) ──→ Author (skrivande)
+                  ←── Amend-knapp
+```
+
+En **Amend-knapp** i Author skickar tillbaka insikter till Mentor-projektet:
+- Lägger till en ny loggpost i Mentor med Author som källa
+- Krypteras med samma nyckel innan det lagras
+- Innehåll: t.ex. slutsatser som framkommit under skrivprocesset, luckor som identifierats, nya frågeställningar
+
+Studenten väljer aktivt vad som skickas tillbaka — det är inte automatiskt.
+
+---
+
 ### Höger panel — Mentor-integration
 
 **Tekniskt:**
