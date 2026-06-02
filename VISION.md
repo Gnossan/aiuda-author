@@ -145,10 +145,21 @@ Exempel: om projektet har tydlig frågeställning och källor men ingen slutsats
 
 **Syfte:** Fungerar som spegel — visar studenten vad researchen faktiskt täcker och var det finns gap att fylla i texten.
 
-### Vänster panel — AI-assistans
-- Skrivtips, feedback och idéer (AI genererar aldrig löpande text)
-- Dispositionsförslag baserade på Mentor-research
-- Kontextuell hjälp baserad på vad användaren skriver
+### Vänster panel — Disposition och AI-chatt
+
+**Disposition:**
+Parallellt med eller direkt efter att höger panel är klar genererar AI en disposition — rubriker och bulletlists baserade på samma research. Samma princip: bara det som faktiskt finns i researchen, inga fabricerade avsnitt.
+
+Dispositionen är ett förslag, inte ett facit. Studenten väljer vad de vill använda.
+
+**AI-chatt:**
+I vänster panel chattar studenten med AI om skrivprocessen:
+- "Hur bör jag strukturera metodavsnittet?"
+- "Vad saknas i mitt argument?"
+- "Ge feedback på den här meningen"
+- "Vilka perspektiv har jag inte täckt?"
+
+AI svarar med frågor, tips och feedback — skriver aldrig löpande text åt studenten.
 
 ## Vad som återstår att besluta
 
