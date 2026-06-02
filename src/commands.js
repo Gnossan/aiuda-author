@@ -1,5 +1,6 @@
 // Formatkommandon per läge
 export const MD_KOMMANDON = [
+    { label: 'Brödtext',      hint: 'p',      action: (editor) => editor.chain().focus().setParagraph().run() },
     { label: '# Rubrik 1',    hint: 'h1',     action: (editor) => editor.chain().focus().toggleHeading({ level: 1 }).run() },
     { label: '## Rubrik 2',   hint: 'h2',     action: (editor) => editor.chain().focus().toggleHeading({ level: 2 }).run() },
     { label: '### Rubrik 3',  hint: 'h3',     action: (editor) => editor.chain().focus().toggleHeading({ level: 3 }).run() },
@@ -12,6 +13,7 @@ export const MD_KOMMANDON = [
 ]
 
 export const WIKI_KOMMANDON = [
+    { label: 'Brödtext',            hint: 'p',  action: (editor) => editor.chain().focus().setParagraph().run() },
     { label: '= Rubrik 1 =',       hint: 'h1', action: (editor) => editor.chain().focus().toggleHeading({ level: 1 }).run() },
     { label: '== Rubrik 2 ==',     hint: 'h2', action: (editor) => editor.chain().focus().toggleHeading({ level: 2 }).run() },
     { label: '=== Rubrik 3 ===',   hint: 'h3', action: (editor) => editor.chain().focus().toggleHeading({ level: 3 }).run() },
