@@ -99,6 +99,21 @@ Läraren kan begära loggen för att se hur AI användes i uppsatsen. Det bygger
 
 ---
 
+## Roadmap — på begäran
+
+Funktioner som inte är med i MVP men som kan läggas till vid efterfrågan:
+
+| Funktion | Issue | Kommentar |
+|---|---|---|
+| Export-dropdown (.html, .tex, .wiki) | #2 | Konverterarna finns, bara UI |
+| LaTeX-trigger-övervägande | #3 | \\ vs / som picker-trigger |
+| Matematiksymboler (KaTeX/MathJax) | #4 | Viktigt för matematik/fysik/ekonometri |
+| Fotnots-editor | — | Studenter behöver fotnots-hantering |
+| Versionshistorik | — | Se hur texten förändrats över tid |
+| Kommentarer och feedback | — | Lärare kommenterar studenttexten |
+| Realtidssamarbete | — | Flera skriver samtidigt |
+| Mobiloptimering | — | Begränsad skrivyta, annorlunda UX |
+
 ## Vad som återstår att besluta
 
 - Betalmodell (Web Store vs Stripe)
