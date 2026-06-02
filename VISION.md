@@ -9,6 +9,13 @@
 
 **AI stödjer tänkandet — ersätter det inte.**
 
+**AI:s åtkomstmodell:**
+- **Vänster panel** (disposition + chatt) — läs- och skrivåtkomst
+- **Höger panel** (research-sammanfattning) — läs- och skrivåtkomst
+- **Skrivytan** (studentens text) — enbart läsåtkomst
+
+AI kan läsa studentens text för att ge feedback, men kan aldrig skriva i den.
+
 AIuda Author är designat för att lärare och kursledare ska *tillåta* studenter att använda det. Det innebär att AI aldrig genererar löpande text. Studenten skriver själv. AI hjälper med struktur, feedback och de mekaniska delarna av skrivprocesset.
 
 ---
