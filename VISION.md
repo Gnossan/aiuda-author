@@ -137,19 +137,15 @@ Author delar krypteringsnyckel med Mentor — ett lösenord för hela AIuda-ekos
 
 ## Sidpaneler
 
-### Tvåvägsflöde — Author ↔ Mentor
+### Amend — komplettera från Mentor
+
+En **Amend-knapp** i höger panel hämtar nytt material från Mentor-projektet och kompletterar den befintliga research-sammanfattningen.
+
+Användningsfall: studenten har fortsatt sin research i Mentor efter att sammanfattningen genererades. Amend uppdaterar höger panel med det som tillkommit — utan att skriva om det som redan finns.
 
 ```
-Mentor (research) ──→ Author (skrivande)
-                  ←── Amend-knapp
+Mentor (uppdaterad research) ──→ Amend ──→ Höger panel (kompletteras)
 ```
-
-En **Amend-knapp** i Author skickar tillbaka insikter till Mentor-projektet:
-- Lägger till en ny loggpost i Mentor med Author som källa
-- Krypteras med samma nyckel innan det lagras
-- Innehåll: t.ex. slutsatser som framkommit under skrivprocesset, luckor som identifierats, nya frågeställningar
-
-Studenten väljer aktivt vad som skickas tillbaka — det är inte automatiskt.
 
 ---
 
