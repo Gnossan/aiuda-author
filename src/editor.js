@@ -3,7 +3,7 @@ import { Plugin, PluginKey } from '@tiptap/pm/state'
 import StarterKit from '@tiptap/starter-kit'
 import Placeholder from '@tiptap/extension-placeholder'
 import CharacterCount from '@tiptap/extension-character-count'
-import { MD_KOMMANDON, WIKI_KOMMANDON, skapaCommandPicker } from './commands.js'
+import { MD_KOMMANDON, WIKI_KOMMANDON, LATEX_KOMMANDON, skapaCommandPicker } from './commands.js'
 
 let aktivtLäge = 'md'  // 'md' eller 'wiki'
 
@@ -31,9 +31,13 @@ const CommandPicker = Extension.create({
                 props: {
                     handleKeyDown(view, event) {
                         // Öppna picker vid # (MD) eller = (Wiki)
-                        const trigger = aktivtLäge === 'md' ? '#' : '='
+                        const trigger = aktivtLäge === 'md' ? '#'
+                                     : aktivtLäge === 'wiki' ? '='
+                                     : '\\'
                         if (event.key === trigger && !event.ctrlKey && !event.metaKey) {
-                            const kommandon = aktivtLäge === 'md' ? MD_KOMMANDON : WIKI_KOMMANDON
+                            const kommandon = aktivtLäge === 'md' ? MD_KOMMANDON
+                                           : aktivtLäge === 'wiki' ? WIKI_KOMMANDON
+                                           : LATEX_KOMMANDON
                             const { top, left } = view.coordsAtPos(view.state.selection.from)
 
                             picker = skapaCommandPicker(kommandon, (item) => {

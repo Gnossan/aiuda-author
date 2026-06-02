@@ -1,27 +1,42 @@
 // Formatkommandon per läge
+const fmt = (fn) => (editor) => fn(editor.chain().focus()).run()
+
 export const MD_KOMMANDON = [
-    { label: 'Brödtext',      hint: 'p',      action: (editor) => editor.chain().focus().setParagraph().run() },
-    { label: '# Rubrik 1',    hint: 'h1',     action: (editor) => editor.chain().focus().toggleHeading({ level: 1 }).run() },
-    { label: '## Rubrik 2',   hint: 'h2',     action: (editor) => editor.chain().focus().toggleHeading({ level: 2 }).run() },
-    { label: '### Rubrik 3',  hint: 'h3',     action: (editor) => editor.chain().focus().toggleHeading({ level: 3 }).run() },
-    { label: '**Fet text**',  hint: 'bold',   action: (editor) => editor.chain().focus().toggleBold().run() },
-    { label: '*Kursiv*',      hint: 'italic', action: (editor) => editor.chain().focus().toggleItalic().run() },
-    { label: '> Citat',       hint: 'quote',  action: (editor) => editor.chain().focus().toggleBlockquote().run() },
-    { label: '- Lista',       hint: 'ul',     action: (editor) => editor.chain().focus().toggleBulletList().run() },
-    { label: '1. Numrerad',   hint: 'ol',     action: (editor) => editor.chain().focus().toggleOrderedList().run() },
-    { label: '--- Linje',     hint: 'hr',     action: (editor) => editor.chain().focus().setHorizontalRule().run() },
+    { label: 'Brödtext',      hint: 'p',      action: fmt(c => c.setParagraph()) },
+    { label: '# Rubrik 1',    hint: 'h1',     action: fmt(c => c.setHeading({ level: 1 })) },
+    { label: '## Rubrik 2',   hint: 'h2',     action: fmt(c => c.setHeading({ level: 2 })) },
+    { label: '### Rubrik 3',  hint: 'h3',     action: fmt(c => c.setHeading({ level: 3 })) },
+    { label: '**Fet**',       hint: 'bold',   action: fmt(c => c.toggleBold()) },
+    { label: '*Kursiv*',      hint: 'italic', action: fmt(c => c.toggleItalic()) },
+    { label: '> Citat',       hint: 'quote',  action: fmt(c => c.setBlockquote()) },
+    { label: '- Lista',       hint: 'ul',     action: fmt(c => c.toggleBulletList()) },
+    { label: '1. Numrerad',   hint: 'ol',     action: fmt(c => c.toggleOrderedList()) },
+    { label: '--- Linje',     hint: 'hr',     action: fmt(c => c.setHorizontalRule()) },
 ]
 
 export const WIKI_KOMMANDON = [
-    { label: 'Brödtext',            hint: 'p',  action: (editor) => editor.chain().focus().setParagraph().run() },
-    { label: '= Rubrik 1 =',       hint: 'h1', action: (editor) => editor.chain().focus().toggleHeading({ level: 1 }).run() },
-    { label: '== Rubrik 2 ==',     hint: 'h2', action: (editor) => editor.chain().focus().toggleHeading({ level: 2 }).run() },
-    { label: '=== Rubrik 3 ===',   hint: 'h3', action: (editor) => editor.chain().focus().toggleHeading({ level: 3 }).run() },
-    { label: "'''Fet'''",          hint: 'bold',   action: (editor) => editor.chain().focus().toggleBold().run() },
-    { label: "''Kursiv''",         hint: 'italic', action: (editor) => editor.chain().focus().toggleItalic().run() },
-    { label: '* Lista',            hint: 'ul',     action: (editor) => editor.chain().focus().toggleBulletList().run() },
-    { label: '# Numrerad',         hint: 'ol',     action: (editor) => editor.chain().focus().toggleOrderedList().run() },
-    { label: '----  Linje',        hint: 'hr',     action: (editor) => editor.chain().focus().setHorizontalRule().run() },
+    { label: 'Brödtext',          hint: 'p',      action: fmt(c => c.setParagraph()) },
+    { label: '= Rubrik 1 =',     hint: 'h1',     action: fmt(c => c.setHeading({ level: 1 })) },
+    { label: '== Rubrik 2 ==',   hint: 'h2',     action: fmt(c => c.setHeading({ level: 2 })) },
+    { label: '=== Rubrik 3 ===', hint: 'h3',     action: fmt(c => c.setHeading({ level: 3 })) },
+    { label: "'''Fet'''",        hint: 'bold',   action: fmt(c => c.toggleBold()) },
+    { label: "''Kursiv''",       hint: 'italic', action: fmt(c => c.toggleItalic()) },
+    { label: '* Lista',          hint: 'ul',     action: fmt(c => c.toggleBulletList()) },
+    { label: '# Numrerad',       hint: 'ol',     action: fmt(c => c.toggleOrderedList()) },
+    { label: '---- Linje',       hint: 'hr',     action: fmt(c => c.setHorizontalRule()) },
+]
+
+export const LATEX_KOMMANDON = [
+    { label: 'Brödtext',              hint: 'p',      action: fmt(c => c.setParagraph()) },
+    { label: '\\section{}',          hint: 'h1',     action: fmt(c => c.setHeading({ level: 1 })) },
+    { label: '\\subsection{}',       hint: 'h2',     action: fmt(c => c.setHeading({ level: 2 })) },
+    { label: '\\subsubsection{}',    hint: 'h3',     action: fmt(c => c.setHeading({ level: 3 })) },
+    { label: '\\textbf{}',           hint: 'bold',   action: fmt(c => c.toggleBold()) },
+    { label: '\\textit{}',           hint: 'italic', action: fmt(c => c.toggleItalic()) },
+    { label: '\\begin{quote}',       hint: 'quote',  action: fmt(c => c.setBlockquote()) },
+    { label: '\\begin{itemize}',     hint: 'ul',     action: fmt(c => c.toggleBulletList()) },
+    { label: '\\begin{enumerate}',   hint: 'ol',     action: fmt(c => c.toggleOrderedList()) },
+    { label: '\\rule{\\textwidth}',  hint: 'hr',     action: fmt(c => c.setHorizontalRule()) },
 ]
 
 // Rendera suggestions-popup
@@ -61,8 +76,9 @@ export function skapaCommandPicker(items, command) {
                 <span style="color:${i === selectedIndex ? '#f0c040' : '#f5f0e8'}">${item.label}</span>
                 <span style="opacity:0.35;font-size:10px;">${item.hint}</span>
             `
-            el.addEventListener('mousedown', (e) => {
+            el.addEventListener('pointerdown', (e) => {
                 e.preventDefault()
+                e.stopPropagation()
                 command(item)
             })
             el.addEventListener('mouseover', () => {
