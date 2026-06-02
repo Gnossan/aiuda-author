@@ -9,10 +9,11 @@
   },
   "dependencies": {
     "@tiptap/core": "latest",
+    "@tiptap/extension-character-count": "latest",
+    "@tiptap/extension-placeholder": "latest",
     "@tiptap/pm": "latest",
     "@tiptap/starter-kit": "latest",
-    "@tiptap/extension-placeholder": "latest",
-    "@tiptap/extension-character-count": "latest"
+    "@tiptap/suggestion": "^3.24.0"
   },
   "devDependencies": {
     "vite": "latest"

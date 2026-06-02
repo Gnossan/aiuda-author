@@ -1,4 +1,4 @@
-import { skapaEditor } from './editor.js'
+import { skapaEditor, sättLäge } from './editor.js'
 import './style.css'
 
 const app = document.getElementById('app')
@@ -13,6 +13,10 @@ app.innerHTML = `
         <input id="doc-title" type="text" placeholder="Dokumenttitel…" spellcheck="false">
       </div>
       <div id="topbar-right">
+        <div id="format-toggle">
+          <button class="format-btn active" data-format="md">MD</button>
+          <button class="format-btn" data-format="wiki">Wiki</button>
+        </div>
         <span id="word-count">0 ord</span>
         <button id="export-btn" title="Exportera">↓</button>
       </div>
@@ -31,6 +35,15 @@ const editorEl = document.getElementById('editor')
 const editor = skapaEditor(editorEl, (ed) => {
     const words = ed.getText().trim().split(/\s+/).filter(Boolean).length
     document.getElementById('word-count').textContent = `${words} ord`
+})
+
+// Format-toggle MD/Wiki
+document.querySelectorAll('.format-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+        document.querySelectorAll('.format-btn').forEach(b => b.classList.remove('active'))
+        btn.classList.add('active')
+        sättLäge(btn.dataset.format)
+    })
 })
 
 // Export-knapp (markdown för nu)
