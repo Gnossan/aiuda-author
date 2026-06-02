@@ -131,10 +131,19 @@ Author delar krypteringsnyckel med Mentor — ett lösenord för hela AIuda-ekos
 ## Sidpaneler
 
 ### Höger panel — Mentor-integration
+
+**Tekniskt:**
 - Hämtar data direkt från Firebase (ingen plugin krävs — Author är webbapp)
-- Visar: projekt, källlogg, sessionssammanfattningar från Mentor
-- Kräver att användaren anger sitt AIuda-lösenord för dekryptering
-- Fungerar som research-underlag för skrivarbetet
+- Kräver AIuda-lösenordet för dekryptering
+
+**AI-genererad research-sammanfattning:**
+AI läser projektets innehåll (chatthistorik, sessionsloggar, anteckningar, källor) och genererar en strukturerad sammanfattning av det som faktiskt finns.
+
+Möjliga avsnitt: frågeställning, bakgrund, metod, material, resultat, diskussion, slutsats — men **bara de avsnitt som faktiskt framgår av researchen**. Saknas ett avsnitt genereras det inte. Studenten måste fylla luckan själv.
+
+Exempel: om projektet har tydlig frågeställning och källor men ingen slutsats → AI presenterar frågeställning och källor, noterar att slutsats saknas — skriver ingenting dit.
+
+**Syfte:** Fungerar som spegel — visar studenten vad researchen faktiskt täcker och var det finns gap att fylla i texten.
 
 ### Vänster panel — AI-assistans
 - Skrivtips, feedback och idéer (AI genererar aldrig löpande text)
