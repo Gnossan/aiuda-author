@@ -165,13 +165,21 @@ body {
   flex: 1;
   overflow-y: auto;
   display: flex;
-  justify-content: center;
-  padding: 48px 20px;
+}
+
+.page-margin {
+  flex: 1;
+  background: color-mix(in srgb, var(--bg) 85%, var(--text) 15%);
+  min-width: 40px;
 }
 
 #editor-wrapper {
   width: 100%;
-  max-width: 680px;
+  max-width: 720px;
+  padding: 48px 40px;
+  background: var(--bg);
+  border-left: 1px solid var(--border);
+  border-right: 1px solid var(--border);
 }
 
 /* ===== TIPTAP EDITOR ===== */

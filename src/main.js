@@ -32,10 +32,12 @@ app.innerHTML = `
     </header>
 
     <main id="main">
+      <div class="page-margin"></div>
       <div id="editor-wrapper">
         <div id="editor"></div>
         <textarea id="source-view" style="display:none" spellcheck="false" placeholder="Skriv Markdown här…"></textarea>
       </div>
+      <div class="page-margin"></div>
     </main>
   </div>
 `
