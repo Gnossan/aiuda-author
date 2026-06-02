@@ -23,6 +23,7 @@ app.innerHTML = `
           <button class="format-btn" data-format="wiki">Wiki</button>
           <button class="format-btn" data-format="latex">LaTeX</button>
         </div>
+        <button id="bg-btn" title="Byt bakgrund">◐</button>
         <span id="word-count">0 ord</span>
         <button id="open-btn" title="Öppna fil">↑</button>
         <input type="file" id="file-input" accept=".md,.txt,.wiki,.tex" style="display:none">
@@ -113,6 +114,24 @@ document.querySelectorAll('.format-btn').forEach(btn => {
 
         aktivtFormat = nyttFormat
     })
+})
+
+// Bakgrundsfärg-toggle
+const BAKGRUNDER = [
+    { bg: '#1a1610', text: '#f5f0e8', border: '#333', name: 'mörk' },
+    { bg: '#f0ede8', text: '#1a1610', border: '#ccc', name: 'grå' },
+    { bg: '#ffffff', text: '#1a1610', border: '#ddd', name: 'vit' },
+]
+let bgIndex = 0
+
+document.getElementById('bg-btn').addEventListener('click', () => {
+    bgIndex = (bgIndex + 1) % BAKGRUNDER.length
+    const { bg, text, border } = BAKGRUNDER[bgIndex]
+    document.documentElement.style.setProperty('--bg', bg)
+    document.documentElement.style.setProperty('--text', text)
+    document.documentElement.style.setProperty('--border', border)
+    document.documentElement.style.setProperty('--surface', bg)
+    document.documentElement.style.setProperty('--muted', text + '80')
 })
 
 // Öppna fil

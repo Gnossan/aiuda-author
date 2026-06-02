@@ -87,6 +87,19 @@ body {
 }
 #export-btn:hover { opacity: 1; }
 
+#bg-btn {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: 4px 8px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  opacity: 0.5;
+  transition: opacity 0.15s;
+}
+#bg-btn:hover { opacity: 1; }
+
 /* Source-vy */
 #source-view {
   width: 100%;
