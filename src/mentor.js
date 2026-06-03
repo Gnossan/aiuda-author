@@ -121,7 +121,9 @@ Håll det koncist — max 3-4 meningar per avsnitt.`
         throw new Error(`Backendfel ${resp.status}: ${text.slice(0, 100)}`)
     }
     const data = await resp.json()
-    return data.result?.content?.[0]?.text || 'Kunde inte generera sammanfattning.'
+    console.log('AI-svar:', JSON.stringify(data).slice(0, 300))
+    console.log('Historik-längd:', synligHistorik.length)
+    return data.result?.content?.[0]?.text || `Tomt svar. Keys: ${Object.keys(data).join(', ')}`
 }
 
 // Visa projekt-picker dialog
