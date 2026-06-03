@@ -45,10 +45,22 @@ app.innerHTML = `
 
     <main id="main">
       <div class="page-margin" id="left-panel">
-        <div id="left-panel-content" style="padding:16px;height:100%;overflow-y:auto;display:flex;flex-direction:column;gap:12px;">
+        <div id="left-panel-content" style="padding:16px;height:100%;display:flex;flex-direction:column;gap:12px;">
           <div style="font-size:10px;opacity:0.4;letter-spacing:0.1em;text-transform:uppercase;">Disposition</div>
-          <div id="disposition" style="font-size:11px;line-height:1.8;opacity:0.7;">
+          <div id="disposition" style="font-size:11px;line-height:1.8;opacity:0.7;flex:1;overflow-y:auto;">
             <span style="opacity:0.4;font-style:italic;">Välj ett Mentor-projekt för att generera disposition.</span>
+          </div>
+          <div id="chatt-sektion" style="display:none;flex-direction:column;gap:8px;border-top:1px solid var(--border);padding-top:12px;">
+            <div style="font-size:10px;opacity:0.4;letter-spacing:0.1em;text-transform:uppercase;">AI-assistent</div>
+            <div id="chatt-meddelanden" style="font-size:11px;line-height:1.7;max-height:200px;overflow-y:auto;display:flex;flex-direction:column;gap:8px;"></div>
+            <div style="display:flex;gap:6px;">
+              <textarea id="chatt-input" rows="2" placeholder="Ställ en fråga om skrivarbetet…"
+                style="flex:1;background:var(--surface);border:1px solid var(--border);border-radius:5px;
+                       color:var(--text);font-family:'DM Mono',monospace;font-size:11px;
+                       padding:6px 8px;resize:none;outline:none;"></textarea>
+              <button id="chatt-skicka" style="padding:0 10px;background:var(--accent);color:#1a1610;
+                border:none;border-radius:5px;cursor:pointer;font-size:13px;align-self:flex-end;">→</button>
+            </div>
           </div>
         </div>
       </div>
@@ -224,6 +236,9 @@ document.getElementById('välj-projekt-btn').addEventListener('click', async () 
                 <div style="opacity:0.4;font-style:italic;">⏳ Genererar sammanfattning…</div>
             `
             let aktivtProjektId = valt.id
+            chattHistorik = [] // Återställ chatt vid projektbyte
+            document.getElementById('chatt-meddelanden').innerHTML = ''
+            document.getElementById('chatt-sektion').style.display = 'flex'
 
             function visaAuthorData(namn, fraga, sammanfattning, disposition, genererad) {
                 const disposEl = document.getElementById('disposition')
@@ -296,6 +311,71 @@ document.getElementById('välj-projekt-btn').addEventListener('click', async () 
     } catch (e) {
         console.error(e)
     }
+})
+
+// Chatt
+let chattHistorik = []
+let aktivtProjektData = null
+
+function visaChatMeddelande(roll, text) {
+    const el = document.createElement('div')
+    el.style.cssText = `font-size:11px;line-height:1.6;padding:6px 8px;border-radius:5px;
+        background:${roll === 'user' ? 'rgba(240,192,64,0.1)' : 'rgba(255,255,255,0.04)'};`
+    el.textContent = text
+    document.getElementById('chatt-meddelanden').appendChild(el)
+    el.scrollIntoView({ behavior: 'smooth' })
+}
+
+async function skickaChattmeddelande() {
+    const input = document.getElementById('chatt-input')
+    const text = input.value.trim()
+    if (!text) return
+
+    input.value = ''
+    visaChatMeddelande('user', text)
+    chattHistorik.push({ role: 'user', content: text })
+
+    // Bygg kontext
+    const skrivyta = editor.getText().slice(0, 3000)
+    const disposition = document.getElementById('disposition')?.innerText?.slice(0, 1000) || ''
+    const sammanfattning = document.getElementById('research-sammanfattning')?.innerText?.slice(0, 1000) || ''
+
+    const systemprompt = `Du är en AI-assistent som hjälper en student med sitt skrivarbete.
+
+Du har läsåtkomst till:
+- Studentens text (skrivyta): ${skrivyta ? `"${skrivyta}"` : '(tom)'}
+- Dispositionen: ${disposition || '(ej genererad)'}
+- Research-sammanfattningen: ${sammanfattning || '(ej genererad)'}
+
+Ge skrivtips, feedback och ställ frågor — skriv ALDRIG löpande text åt studenten.
+Svara kort och konkret. Samma språk som studenten.`
+
+    const tänker = document.createElement('div')
+    tänker.style.cssText = 'font-size:11px;opacity:0.4;font-style:italic;'
+    tänker.textContent = '⏳'
+    document.getElementById('chatt-meddelanden').appendChild(tänker)
+
+    try {
+        const token = await auth.currentUser?.getIdToken()
+        const resp = await fetch('https://aiuda-mentor-backend.vercel.app/api/chat', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+            body: JSON.stringify({ historik: chattHistorik, systemprompt, model: 'claude-sonnet-4-6' })
+        })
+        const data = await resp.json()
+        const svar = data.result?.content?.[0]?.text || 'Kunde inte svara.'
+        tänker.remove()
+        chattHistorik.push({ role: 'assistant', content: svar })
+        visaChatMeddelande('assistant', svar)
+    } catch (e) {
+        tänker.remove()
+        visaChatMeddelande('assistant', `Fel: ${e.message}`)
+    }
+}
+
+document.getElementById('chatt-skicka').addEventListener('click', skickaChattmeddelande)
+document.getElementById('chatt-input').addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); skickaChattmeddelande() }
 })
 
 // Auth
