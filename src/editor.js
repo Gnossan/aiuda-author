@@ -20,10 +20,18 @@ const CommandPicker = Extension.create({
         let picker = null
 
         const stängPicker = () => {
-            popup?.remove()
-            popup = null
-            picker = null
+            if (popup) {
+                popup.remove()
+                popup = null
+                picker = null
+            }
         }
+
+        // Global stängning vid klick/scroll utanför
+        document.addEventListener('pointerdown', (e) => {
+            if (popup && !popup.contains(e.target)) stängPicker()
+        })
+        document.addEventListener('scroll', () => { if (popup) stängPicker() }, true)
 
         return [
             new Plugin({
@@ -49,10 +57,7 @@ const CommandPicker = Extension.create({
                             document.body.appendChild(picker.el)
                             popup = picker.el
 
-                            // Stäng vid klick utanför
-                            setTimeout(() => {
-                                document.addEventListener('click', stängPicker, { once: true })
-                            }, 50)
+                            // Global lyssnare hanterar stängning
 
                             return true  // Förhindra att tecknet skrivs in
                         }
