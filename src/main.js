@@ -22,9 +22,7 @@ app.innerHTML = `
       <div id="topbar-left">
         <span class="logo">AI<span class="accent">u</span>da Author<sup class="tm">™</sup></span>
       </div>
-      <div id="topbar-center">
-        <input id="doc-title" type="text" placeholder="Dokumenttitel…" spellcheck="false">
-      </div>
+      <div id="topbar-center"></div>
       <div id="topbar-right">
         <div id="view-toggle">
           <button class="view-btn active" data-view="wysiwyg">WYSIWYG</button>
@@ -48,6 +46,12 @@ app.innerHTML = `
     <main id="main">
       <div class="page-margin" id="left-panel">
         <div id="left-panel-content" style="padding:16px;height:100%;display:flex;flex-direction:column;gap:12px;overflow-y:auto;">
+          <input id="doc-title" type="text" placeholder="Dokumenttitel…" spellcheck="false"
+            style="text-align:right;background:transparent;border:none;border-bottom:1px solid transparent;
+                   color:var(--text);font-family:'DM Mono',monospace;font-size:12px;padding:4px 0;
+                   outline:none;width:100%;transition:border-color 0.15s;"
+            onfocus="this.style.borderBottomColor='var(--accent)'"
+            onblur="this.style.borderBottomColor='transparent'">
           <div style="font-size:10px;opacity:0.4;letter-spacing:0.1em;text-transform:uppercase;">Disposition</div>
           <div id="disposition" style="font-size:11px;line-height:1.8;opacity:0.7;">
             <span style="opacity:0.4;font-style:italic;">Välj ett Mentor-projekt för att generera disposition.</span>
@@ -66,10 +70,12 @@ app.innerHTML = `
           </div>
         </div>
       </div>
+      <div class="resizer" id="resizer-left"></div>
       <div id="editor-wrapper">
         <div id="editor"></div>
         <textarea id="source-view" style="display:none" spellcheck="false" placeholder="Skriv Markdown här…"></textarea>
       </div>
+      <div class="resizer" id="resizer-right"></div>
       <div class="page-margin" id="right-panel">
         <div id="right-panel-content" style="padding:16px;height:100%;overflow-y:auto;">
           <button id="välj-projekt-btn" style="
@@ -342,6 +348,43 @@ async function öppnaProjekt(valt) {
                 sammanfattEl.innerHTML += `<div style="color:#ff6b6b;margin-top:8px;">Fel: ${e.message}</div>`
             }
 }
+
+// Dragbara resizers
+function initResizer(resizerId, vänsterEl, högerEl, sparaKey) {
+    const resizer = document.getElementById(resizerId)
+    if (!resizer) return
+    resizer.addEventListener('mousedown', (e) => {
+        e.preventDefault()
+        resizer.classList.add('dragging')
+        const startX = e.clientX
+        const startVänster = vänsterEl.offsetWidth
+        const totalWidth = vänsterEl.parentElement.offsetWidth
+
+        const onMove = (e) => {
+            const delta = e.clientX - startX
+            const nyBredd = Math.max(120, Math.min(totalWidth * 0.4, startVänster + delta))
+            vänsterEl.style.width = nyBredd + 'px'
+            vänsterEl.style.maxWidth = 'none'
+        }
+        const onUp = () => {
+            resizer.classList.remove('dragging')
+            document.removeEventListener('mousemove', onMove)
+            document.removeEventListener('mouseup', onUp)
+            if (sparaKey) localStorage.setItem(sparaKey, vänsterEl.offsetWidth)
+        }
+        document.addEventListener('mousemove', onMove)
+        document.addEventListener('mouseup', onUp)
+    })
+}
+
+// Ladda sparade bredder
+const sparadVänster = localStorage.getItem('author-left-width')
+const sparadHöger = localStorage.getItem('author-right-width')
+if (sparadVänster) { const el = document.getElementById('left-panel'); if (el) { el.style.width = sparadVänster + 'px'; el.style.maxWidth = 'none' } }
+if (sparadHöger) { const el = document.getElementById('right-panel'); if (el) { el.style.width = sparadHöger + 'px'; el.style.maxWidth = 'none' } }
+
+initResizer('resizer-left', document.getElementById('left-panel'), document.getElementById('editor-wrapper'), 'author-left-width')
+initResizer('resizer-right', document.getElementById('editor-wrapper'), document.getElementById('right-panel'), 'author-right-width')
 
 // Chatt
 let chattHistorik = []
