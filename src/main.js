@@ -98,7 +98,8 @@ const editor = skapaEditor(editorEl, (ed) => {
     if (aktivtDokumentProjektId) {
         clearTimeout(sparaTimeout)
         sparaTimeout = setTimeout(async () => {
-            await sparaDokument(aktivtDokumentProjektId, ed.getHTML())
+            const titel = document.getElementById('doc-title').value
+            await sparaDokument(aktivtDokumentProjektId, ed.getHTML(), titel)
         }, 2000)
     }
 })
@@ -263,11 +264,13 @@ async function öppnaProjekt(valt) {
 
             // Ladda sparat dokument
             try {
-                const sparadText = await laddaDokument(valt.id)
-                if (sparadText) {
-                    editor.commands.setContent(sparadText)
+                const sparat = await laddaDokument(valt.id)
+                if (sparat) {
+                    editor.commands.setContent(sparat.html)
+                    if (sparat.titel) document.getElementById('doc-title').value = sparat.titel
                 } else {
                     editor.commands.clearContent()
+                    document.getElementById('doc-title').value = ''
                 }
             } catch { editor.commands.clearContent() }
 

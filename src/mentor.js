@@ -76,10 +76,10 @@ export async function hämtaProjekt(projektId) {
 }
 
 // Spara och ladda studentens text (krypterat)
-export async function sparaDokument(projektId, html) {
+export async function sparaDokument(projektId, html, titel) {
     const uid = auth.currentUser?.uid
     if (!uid) return
-    const krypterat = await kryptera(html)
+    const krypterat = await kryptera({ html, titel: titel || '' })
     if (!krypterat) return
     const ref = doc(db, 'users', uid, 'mentor_projekt', projektId)
     await setDoc(ref, { authorDokument: krypterat, authorDokumentSparat: new Date().toISOString() }, { merge: true })
@@ -91,7 +91,10 @@ export async function laddaDokument(projektId) {
     const ref = doc(db, 'users', uid, 'mentor_projekt', projektId)
     const snap = await getDoc(ref)
     if (!snap.exists() || !snap.data().authorDokument) return null
-    return dekryptera(snap.data().authorDokument)
+    const data = await dekryptera(snap.data().authorDokument)
+    // Bakåtkompatibelt: gamla versioner sparade bara html-strängen
+    if (typeof data === 'string') return { html: data, titel: '' }
+    return data
 }
 
 // Spara genererad sammanfattning och disposition till Firebase
