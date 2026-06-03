@@ -159,7 +159,7 @@ document.querySelectorAll('.format-btn').forEach(btn => {
                 const konverterad = nyttFormat === 'wiki' ? htmlTillWiki(html)
                                   : nyttFormat === 'latex' ? htmlTillLatex(html)
                                   : htmlTillMarkdown(html)
-                sourceEl.value = konverterad
+                sourceEl.value = `[HTML mellan: ${html.slice(0,100)}]\n\n${konverterad}`
             } catch(e) {
                 sourceEl.value = `FEL vid konvertering: ${e.message}`
             }
