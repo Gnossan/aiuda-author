@@ -72,7 +72,18 @@ export async function hämtaProjekt(projektId) {
         }
     }
 
-    return { id: snap.id, historik, metadata, ...data }
+    // Dekryptera sammanfattning/disposition om de finns krypterade
+    let authorSammanfattning = data.authorSammanfattning || null
+    let authorDisposition = data.authorDisposition || null
+    if (nyckel && data.authorData) {
+        const decrypted = await dekryptera(data.authorData)
+        if (decrypted) {
+            authorSammanfattning = decrypted.sammanfattning || null
+            authorDisposition = decrypted.disposition || null
+        }
+    }
+
+    return { id: snap.id, historik, metadata, authorSammanfattning, authorDisposition, ...data }
 }
 
 // Spara och ladda studentens text (krypterat)
@@ -97,15 +108,18 @@ export async function laddaDokument(projektId) {
     return data
 }
 
-// Spara genererad sammanfattning och disposition till Firebase
+// Spara genererad sammanfattning och disposition till Firebase (krypterat)
 export async function sparaAuthorData(projektId, sammanfattning, disposition) {
     const uid = auth.currentUser?.uid
     if (!uid) return
+    const krypterat = await kryptera({ sammanfattning: sammanfattning || '', disposition: disposition || '' })
     const ref = doc(db, 'users', uid, 'mentor_projekt', projektId)
     await setDoc(ref, {
-        authorSammanfattning: sammanfattning || null,
-        authorDisposition: disposition || null,
-        authorGenererad: new Date().toISOString()
+        authorData: krypterat,
+        authorGenererad: new Date().toISOString(),
+        // Ta bort gamla okrypterade fält
+        authorSammanfattning: null,
+        authorDisposition: null,
     }, { merge: true })
 }
 
