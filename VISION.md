@@ -207,6 +207,17 @@ I vänster panel chattar studenten med AI om skrivprocessen:
 
 AI svarar med frågor, tips och feedback — skriver aldrig löpande text åt studenten.
 
+## Beslut: Chatthistorik sparas inte
+
+Author sparar **inte** chattkonversationer mellan sessioner — till skillnad från Mentor.
+
+**Motivering:**
+- I Mentor *är* konversationerna researchen — de bygger kunskap över tid
+- I Author är chatten ett skrivverktyg för stunden — det som har värde är texten, inte diskussionen som ledde dit
+- Varje session börjar fresh, vilket är pedagogiskt avsiktligt: studenten ska inte luta sig på vad AI sa förra gången
+
+Transparensloggen (framtida, se roadmap) kan i sådana fall logga interaktionstyper utan att spara hela konversationer.
+
 ## Vad som återstår att besluta
 
 - Betalmodell (Web Store vs Stripe)
