@@ -46,7 +46,9 @@ export function htmlTillWiki(html) {
         }
     }
 
-    return Array.from(div.childNodes).map(nodeToWiki).join('').trim()
+    return Array.from(div.childNodes).map(nodeToWiki).join('')
+        .replace(/\n{3,}/g, '\n\n')  // max ett tomt radmellanrum
+        .trim()
 }
 
 // HTML → LaTeX
