@@ -236,7 +236,11 @@ document.getElementById('välj-projekt-btn').addEventListener('click', async () 
     try {
         await säkerställNyckel()
         const projekt = await hämtaProjektlista()
-        visaProjektPicker(projekt, async (valt) => {
+        visaProjektPicker(projekt, (valt) => öppnaProjekt(valt))
+    } catch (e) { console.error(e) }
+})
+
+async function öppnaProjekt(valt) {
             const sammanfattEl = document.getElementById('research-sammanfattning')
             sammanfattEl.innerHTML = `
                 <div style="color:#f0c040;font-weight:600;margin-bottom:8px;">
@@ -247,6 +251,9 @@ document.getElementById('välj-projekt-btn').addEventListener('click', async () 
             `
             let aktivtProjektId = valt.id
             aktivtDokumentProjektId = valt.id
+            sessionStorage.setItem('author_projektId', valt.id)
+            sessionStorage.setItem('author_projektNamn', valt.namn || '')
+            sessionStorage.setItem('author_projektFraga', valt.fraga || '')
             chattHistorik = []
             document.getElementById('chatt-meddelanden').innerHTML = ''
             document.getElementById('chatt-sektion').style.display = 'flex'
@@ -328,11 +335,7 @@ document.getElementById('välj-projekt-btn').addEventListener('click', async () 
             } catch (e) {
                 sammanfattEl.innerHTML += `<div style="color:#ff6b6b;margin-top:8px;">Fel: ${e.message}</div>`
             }
-        })
-    } catch (e) {
-        console.error(e)
-    }
-})
+}
 
 // Chatt
 let chattHistorik = []
@@ -410,6 +413,19 @@ onAuth((user) => {
         loginVy.style.display = 'none'
         layout.style.display = 'flex'
         if (userInfo) userInfo.textContent = user.displayName || user.email
+
+        // Återöppna senaste projektet om det finns
+        const sparadId = sessionStorage.getItem('author_projektId')
+        const sparadNamn = sessionStorage.getItem('author_projektNamn')
+        const sparadFraga = sessionStorage.getItem('author_projektFraga')
+        if (sparadId) {
+            setTimeout(async () => {
+                try {
+                    await säkerställNyckel()
+                    await öppnaProjekt({ id: sparadId, namn: sparadNamn, fraga: sparadFraga })
+                } catch {}
+            }, 800)
+        }
     } else {
         loginVy.style.display = 'flex'
         layout.style.display = 'none'
