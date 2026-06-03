@@ -239,7 +239,7 @@ document.getElementById('välj-projekt-btn').addEventListener('click', async () 
                         ${valt.namn || valt.fraga?.slice(0,40) || valt.id}
                     </div>
                     <div style="opacity:0.5;font-size:10px;margin-bottom:12px;">${valt.fraga || ''}</div>
-                    <div style="line-height:1.8;white-space:pre-wrap;">${sammanfattning}</div>
+                    <div style="line-height:1.8;">${markdownTillHtml(sammanfattning)}</div>
                 `
 
                 if (disposition) {
