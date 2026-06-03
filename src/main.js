@@ -45,14 +45,14 @@ app.innerHTML = `
 
     <main id="main">
       <div class="page-margin" id="left-panel">
-        <div id="left-panel-content" style="padding:16px;height:100%;display:flex;flex-direction:column;gap:12px;">
+        <div id="left-panel-content" style="padding:16px;height:100%;display:flex;flex-direction:column;gap:12px;overflow-y:auto;">
           <div style="font-size:10px;opacity:0.4;letter-spacing:0.1em;text-transform:uppercase;">Disposition</div>
-          <div id="disposition" style="font-size:11px;line-height:1.8;opacity:0.7;flex:1;overflow-y:auto;">
+          <div id="disposition" style="font-size:11px;line-height:1.8;opacity:0.7;">
             <span style="opacity:0.4;font-style:italic;">Välj ett Mentor-projekt för att generera disposition.</span>
           </div>
           <div id="chatt-sektion" style="display:none;flex-direction:column;gap:8px;border-top:1px solid var(--border);padding-top:12px;">
             <div style="font-size:10px;opacity:0.4;letter-spacing:0.1em;text-transform:uppercase;">AI-assistent</div>
-            <div id="chatt-meddelanden" style="font-size:11px;line-height:1.7;max-height:200px;overflow-y:auto;display:flex;flex-direction:column;gap:8px;"></div>
+            <div id="chatt-meddelanden" style="font-size:11px;line-height:1.7;display:flex;flex-direction:column;gap:8px;"></div>
             <div style="display:flex;gap:6px;">
               <textarea id="chatt-input" rows="2" placeholder="Ställ en fråga om skrivarbetet…"
                 style="flex:1;background:var(--surface);border:1px solid var(--border);border-radius:5px;
