@@ -1,5 +1,5 @@
 import { db, auth } from './auth.js'
-import { collection, getDocs, doc, getDoc, query, orderBy, limit } from 'firebase/firestore'
+import { collection, getDocs, doc, getDoc, setDoc, query, orderBy, limit } from 'firebase/firestore'
 import { hämtaNyckel, dekryptera, visaLösenordsDialog } from './crypto.js'
 
 // Hämta och lås upp krypteringsnyckeln om behövs
@@ -73,6 +73,18 @@ export async function hämtaProjekt(projektId) {
     }
 
     return { id: snap.id, historik, metadata, ...data }
+}
+
+// Spara genererad sammanfattning och disposition till Firebase
+export async function sparaAuthorData(projektId, sammanfattning, disposition) {
+    const uid = auth.currentUser?.uid
+    if (!uid) return
+    const ref = doc(db, 'users', uid, 'mentor_projekt', projektId)
+    await setDoc(ref, {
+        authorSammanfattning: sammanfattning || null,
+        authorDisposition: disposition || null,
+        authorGenererad: new Date().toISOString()
+    }, { merge: true })
 }
 
 const MENTOR_BACKEND = 'https://aiuda-mentor-backend.vercel.app'

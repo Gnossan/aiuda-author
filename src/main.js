@@ -1,7 +1,7 @@
 import { skapaEditor, sättLäge } from './editor.js'
 import { htmlTillMarkdown, markdownTillHtml, htmlTillWiki, wikiTillHtml, htmlTillLatex, latexTillHtml } from './converter.js'
 import { loggaIn, loggaUt, onAuth } from './auth.js'
-import { hämtaProjektlista, visaProjektPicker, säkerställNyckel, hämtaProjekt, genereraResearchSammanfattning, genereraDisposition } from './mentor.js'
+import { hämtaProjektlista, visaProjektPicker, säkerställNyckel, hämtaProjekt, genereraResearchSammanfattning, genereraDisposition, sparaAuthorData } from './mentor.js'
 import './style.css'
 
 let aktivAnvändare = null
@@ -223,29 +223,71 @@ document.getElementById('välj-projekt-btn').addEventListener('click', async () 
                 <div style="opacity:0.5;font-size:10px;margin-bottom:12px;">${valt.fraga || ''}</div>
                 <div style="opacity:0.4;font-style:italic;">⏳ Genererar sammanfattning…</div>
             `
-            try {
-                const projektData = await hämtaProjekt(valt.id)
-                const disposEl = document.getElementById('disposition')
-                disposEl.innerHTML = '<span style="opacity:0.4;font-style:italic;">⏳ Genererar disposition…</span>'
+            let aktivtProjektId = valt.id
 
-                // Kör sammanfattning och disposition parallellt
-                const [sammanfattning, disposition] = await Promise.all([
-                    genereraResearchSammanfattning(projektData),
-                    genereraDisposition(projektData)
-                ])
+            function visaAuthorData(namn, fraga, sammanfattning, disposition, genererad) {
+                const disposEl = document.getElementById('disposition')
+                const åldersText = genererad
+                    ? `<span style="opacity:0.3;font-size:10px;">Genererad ${new Date(genererad).toLocaleDateString('sv-SE')}</span>`
+                    : ''
 
                 sammanfattEl.innerHTML = `
-                    <div style="color:#f0c040;font-weight:600;margin-bottom:8px;">
-                        ${valt.namn || valt.fraga?.slice(0,40) || valt.id}
+                    <div style="color:#f0c040;font-weight:600;margin-bottom:4px;">
+                        ${namn || fraga?.slice(0,40) || valt.id}
                     </div>
-                    <div style="opacity:0.5;font-size:10px;margin-bottom:12px;">${valt.fraga || ''}</div>
-                    <pre class="panel-text">${sammanfattning}</pre>
+                    <div style="opacity:0.5;font-size:10px;margin-bottom:4px;">${fraga || ''}</div>
+                    ${åldersText}
+                    <button id="regenerera-btn" style="display:block;margin:8px 0 12px;padding:4px 10px;
+                        background:transparent;border:1px solid rgba(240,192,64,0.3);border-radius:4px;
+                        color:#f0c040;font-family:'DM Mono',monospace;font-size:10px;cursor:pointer;opacity:0.7;">
+                        ↺ Generera om
+                    </button>
+                    <pre class="panel-text">${sammanfattning || '–'}</pre>
                 `
+                disposEl.innerHTML = disposition
+                    ? `<pre class="panel-text">${disposition}</pre>`
+                    : '<span style="opacity:0.4;font-style:italic;">Ingen disposition.</span>'
 
-                if (disposition) {
-                    disposEl.innerHTML = `<pre class="panel-text">${disposition}</pre>`
+                document.getElementById('regenerera-btn').addEventListener('click', () => {
+                    genereraOm(aktivtProjektId, namn, fraga)
+                })
+            }
+
+            async function genereraOm(projektId, namn, fraga) {
+                const disposEl = document.getElementById('disposition')
+                sammanfattEl.innerHTML = `
+                    <div style="color:#f0c040;font-weight:600;margin-bottom:8px;">${namn || fraga?.slice(0,40)}</div>
+                    <span style="opacity:0.4;font-style:italic;">⏳ Genererar…</span>
+                `
+                disposEl.innerHTML = '<span style="opacity:0.4;font-style:italic;">⏳ Genererar disposition…</span>'
+                try {
+                    const projektData = await hämtaProjekt(projektId)
+                    const [sammanfattning, disposition] = await Promise.all([
+                        genereraResearchSammanfattning(projektData),
+                        genereraDisposition(projektData)
+                    ])
+                    await sparaAuthorData(projektId, sammanfattning, disposition)
+                    visaAuthorData(namn, fraga, sammanfattning, disposition, new Date().toISOString())
+                } catch (e) {
+                    sammanfattEl.innerHTML += `<div style="color:#ff6b6b;margin-top:8px;">Fel: ${e.message}</div>`
+                }
+            }
+
+            try {
+                const projektData = await hämtaProjekt(valt.id)
+                const sparad = projektData.authorSammanfattning
+
+                if (sparad) {
+                    // Visa sparad version direkt
+                    visaAuthorData(
+                        valt.namn, valt.fraga,
+                        projektData.authorSammanfattning,
+                        projektData.authorDisposition,
+                        projektData.authorGenererad
+                    )
                 } else {
-                    disposEl.innerHTML = '<span style="opacity:0.4;font-style:italic;">Ingen disposition kunde genereras.</span>'
+                    // Ingen sparad — generera direkt första gången
+                    await genereraOm(valt.id, valt.namn, valt.fraga)
                 }
             } catch (e) {
                 sammanfattEl.innerHTML += `<div style="color:#ff6b6b;margin-top:8px;">Fel: ${e.message}</div>`
