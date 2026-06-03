@@ -38,7 +38,6 @@ const CommandPicker = Extension.create({
                 key: new PluginKey('commandPicker'),
                 props: {
                     handleKeyDown(view, event) {
-                        if (event.key === '#' || event.key === '=') console.log('handleKeyDown:', event.key, 'läge:', aktivtLäge, 'picker:', !!picker)
                         // Öppna picker vid # (MD) eller = (Wiki)
                         const trigger = aktivtLäge === 'md' ? '#'
                                      : aktivtLäge === 'wiki' ? '='

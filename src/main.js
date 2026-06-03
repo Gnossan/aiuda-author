@@ -151,15 +151,18 @@ document.querySelectorAll('.format-btn').forEach(btn => {
 
         // Konvertera dokumentet om source är aktiv
         if (aktivVy === 'source') {
-            const text = sourceEl.value
-            // Parsra nuvarande format till HTML
-            const html = aktivtFormat === 'wiki' ? wikiTillHtml(text)
-                       : aktivtFormat === 'latex' ? latexTillHtml(text)
-                       : markdownTillHtml(text)
-            // Serialisera HTML till nytt format
-            sourceEl.value = nyttFormat === 'wiki' ? htmlTillWiki(html)
-                           : nyttFormat === 'latex' ? htmlTillLatex(html)
-                           : htmlTillMarkdown(html)
+            try {
+                const text = sourceEl.value
+                const html = aktivtFormat === 'wiki' ? wikiTillHtml(text)
+                           : aktivtFormat === 'latex' ? latexTillHtml(text)
+                           : markdownTillHtml(text)
+                const konverterad = nyttFormat === 'wiki' ? htmlTillWiki(html)
+                                  : nyttFormat === 'latex' ? htmlTillLatex(html)
+                                  : htmlTillMarkdown(html)
+                sourceEl.value = konverterad
+            } catch(e) {
+                sourceEl.value = `FEL vid konvertering: ${e.message}`
+            }
         } else {
             // WYSIWYG — uppdatera bara format-läget för picker
             // (konverteringen sker vid växling till source)
