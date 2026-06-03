@@ -98,12 +98,16 @@ export async function sparaDokument(projektId, html, titel) {
 
 export async function laddaDokument(projektId) {
     const uid = auth.currentUser?.uid
-    if (!uid) return null
+    if (!uid) { console.warn('laddaDokument: ej inloggad'); return null }
     const ref = doc(db, 'users', uid, 'mentor_projekt', projektId)
     const snap = await getDoc(ref)
-    if (!snap.exists() || !snap.data().authorDokument) return null
-    const data = await dekryptera(snap.data().authorDokument)
-    // Bakåtkompatibelt: gamla versioner sparade bara html-strängen
+    if (!snap.exists()) { console.warn('laddaDokument: dokument finns inte'); return null }
+    const snapData = snap.data()
+    if (!snapData.authorDokument) { console.warn('laddaDokument: authorDokument saknas'); return null }
+    console.log('laddaDokument: dekrypterar...')
+    const data = await dekryptera(snapData.authorDokument)
+    console.log('laddaDokument: data typ:', typeof data, 'värde:', data ? JSON.stringify(data).slice(0, 100) : 'null')
+    if (!data) return null
     if (typeof data === 'string') return { html: data, titel: '' }
     return data
 }
