@@ -46,12 +46,6 @@ app.innerHTML = `
     <main id="main">
       <div class="page-margin" id="left-panel">
         <div id="left-panel-content" style="padding:16px;height:100%;display:flex;flex-direction:column;gap:12px;overflow-y:auto;">
-          <input id="doc-title" type="text" placeholder="Dokumenttitel…" spellcheck="false"
-            style="text-align:right;background:transparent;border:none;border-bottom:1px solid transparent;
-                   color:var(--text);font-family:'DM Mono',monospace;font-size:12px;padding:4px 0;
-                   outline:none;width:100%;transition:border-color 0.15s;"
-            onfocus="this.style.borderBottomColor='var(--accent)'"
-            onblur="this.style.borderBottomColor='transparent'">
           <div style="font-size:10px;opacity:0.4;letter-spacing:0.1em;text-transform:uppercase;">Disposition</div>
           <div id="disposition" style="font-size:11px;line-height:1.8;opacity:0.7;">
             <span style="opacity:0.4;font-style:italic;">Välj ett Mentor-projekt för att generera disposition.</span>
@@ -72,6 +66,12 @@ app.innerHTML = `
       </div>
       <div class="resizer" id="resizer-left"></div>
       <div id="editor-wrapper">
+        <input id="doc-title" type="text" placeholder="Dokumenttitel…" spellcheck="false"
+          style="text-align:right;background:transparent;border:none;border-bottom:1px solid transparent;
+                 color:var(--text);font-family:'DM Mono',monospace;font-size:12px;padding:4px 0;
+                 outline:none;width:100%;margin-bottom:24px;transition:border-color 0.15s;"
+          onfocus="this.style.borderBottomColor='var(--accent)'"
+          onblur="this.style.borderBottomColor='transparent'">
         <div id="editor"></div>
         <textarea id="source-view" style="display:none" spellcheck="false" placeholder="Skriv Markdown här…"></textarea>
       </div>
