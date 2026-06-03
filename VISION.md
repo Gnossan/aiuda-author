@@ -146,6 +146,7 @@ Funktioner som inte är med i MVP men som kan läggas till vid efterfrågan:
 | Kommentarer och feedback | — | Lärare kommenterar studenttexten |
 | Realtidssamarbete | — | Flera skriver samtidigt |
 | Mobiloptimering | — | Begränsad skrivyta, annorlunda UX |
+| Transparenslogg | — | Audit-trail för lärare — AI-interaktioner loggade per session |
 
 ## Kryptering och nyckelhantering
 
