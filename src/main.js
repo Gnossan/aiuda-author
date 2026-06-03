@@ -422,8 +422,10 @@ onAuth((user) => {
             setTimeout(async () => {
                 try {
                     await säkerställNyckel()
-                    await öppnaProjekt({ id: sparadId, namn: sparadNamn, fraga: sparadFraga })
-                } catch {}
+                    await öppnaProjekt({ id: sparadId, namn: sparadNamn || '', fraga: sparadFraga || '' })
+                } catch (e) {
+                    console.error('Kunde inte återöppna projekt:', e.message)
+                }
             }, 800)
         }
     } else {
