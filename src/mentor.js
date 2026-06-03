@@ -98,20 +98,28 @@ Inkludera BARA de avsnitt som faktiskt framgår av konversationen — fabricera 
 Om ett avsnitt saknas, hoppa över det. Skriv på samma språk som konversationen.
 Håll det koncist — max 3-4 meningar per avsnitt.`
 
-    const resp = await fetch(`${MENTOR_BACKEND}/api/chat`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify({
-            historik: synligHistorik,
-            systemprompt: prompt,
-            model: 'claude-sonnet-4-6'
+    let resp
+    try {
+        resp = await fetch(`${MENTOR_BACKEND}/api/chat`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({
+                historik: synligHistorik,
+                systemprompt: prompt,
+                model: 'claude-sonnet-4-6'
+            })
         })
-    })
+    } catch (e) {
+        throw new Error(`Nätverksfel: ${e.message}. Kontrollera att du är ansluten.`)
+    }
 
-    if (!resp.ok) throw new Error(`AI-fel: ${resp.status}`)
+    if (!resp.ok) {
+        const text = await resp.text().catch(() => '')
+        throw new Error(`Backendfel ${resp.status}: ${text.slice(0, 100)}`)
+    }
     const data = await resp.json()
     return data.result?.content?.[0]?.text || 'Kunde inte generera sammanfattning.'
 }
