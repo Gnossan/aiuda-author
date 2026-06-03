@@ -20,6 +20,13 @@ body {
   flex-direction: column;
 }
 
+/* ===== LAYOUT ===== */
+#layout {
+  flex-direction: column;
+  height: 100vh;
+  width: 100%;
+}
+
 /* ===== TOPBAR ===== */
 #topbar {
   display: flex;
