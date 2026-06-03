@@ -1,7 +1,22 @@
 import { db, auth } from './auth.js'
 import { collection, getDocs, doc, getDoc, query, orderBy, limit } from 'firebase/firestore'
+import { hämtaNyckel, dekryptera, visaLösenordsDialog } from './crypto.js'
 
-// Hämta Mentor-projektlistan (metadata)
+// Hämta och lås upp krypteringsnyckeln om behövs
+export async function säkerställNyckel() {
+    if (hämtaNyckel()) return hämtaNyckel()
+
+    const uid = auth.currentUser?.uid
+    if (!uid) throw new Error('Ej inloggad')
+
+    const ref = doc(db, 'users', uid, 'kryptering', 'nyckel')
+    const snap = await getDoc(ref)
+    if (!snap.exists()) throw new Error('Ingen krypteringsnyckel hittad')
+
+    return visaLösenordsDialog(snap.data())
+}
+
+// Hämta Mentor-projektlistan med dekrypterade namn
 export async function hämtaProjektlista() {
     const uid = auth.currentUser?.uid
     if (!uid) throw new Error('Ej inloggad')
@@ -12,13 +27,26 @@ export async function hämtaProjektlista() {
         limit(50)
     )
     const snap = await getDocs(q)
-    return snap.docs.map(d => ({
-        id: d.id,
-        namn: d.data().namn || '',
-        fraga: d.data().fraga || '',
-        krypteradMetadata: d.data().krypteradMetadata || null,
-        senastSparat: d.data().senastSparat?.toDate?.()?.toISOString() || null
+    const nyckel = hämtaNyckel()
+
+    const projekt = await Promise.all(snap.docs.map(async d => {
+        const data = d.data()
+        let namn = data.namn || ''
+        let fraga = data.fraga || ''
+
+        // Dekryptera metadata om nyckel finns
+        if (nyckel && data.krypteradMetadata) {
+            const meta = await dekryptera(data.krypteradMetadata)
+            if (meta) { namn = meta.namn || ''; fraga = meta.fraga || '' }
+        }
+
+        return {
+            id: d.id, namn, fraga,
+            senastSparat: data.senastSparat?.toDate?.()?.toISOString() || null
+        }
     }))
+
+    return projekt
 }
 
 // Hämta ett specifikt projekt (krypterat innehåll)

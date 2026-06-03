@@ -1,7 +1,7 @@
 import { skapaEditor, sättLäge } from './editor.js'
 import { htmlTillMarkdown, markdownTillHtml, htmlTillWiki, wikiTillHtml, htmlTillLatex, latexTillHtml } from './converter.js'
 import { loggaIn, loggaUt, onAuth } from './auth.js'
-import { hämtaProjektlista, visaProjektPicker } from './mentor.js'
+import { hämtaProjektlista, visaProjektPicker, säkerställNyckel } from './mentor.js'
 import './style.css'
 
 let aktivAnvändare = null
@@ -205,6 +205,7 @@ document.getElementById('file-input').addEventListener('change', (e) => {
 // Höger panel — Mentor-projekt
 document.getElementById('välj-projekt-btn').addEventListener('click', async () => {
     try {
+        await säkerställNyckel()
         const projekt = await hämtaProjektlista()
         visaProjektPicker(projekt, (valt) => {
             document.getElementById('research-sammanfattning').innerHTML = `
