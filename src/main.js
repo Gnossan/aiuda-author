@@ -386,6 +386,17 @@ if (sparadHöger) { const el = document.getElementById('right-panel'); if (el) {
 initResizer('resizer-left', document.getElementById('left-panel'), document.getElementById('editor-wrapper'), 'author-left-width')
 initResizer('resizer-right', document.getElementById('editor-wrapper'), document.getElementById('right-panel'), 'author-right-width')
 
+// Spara titeln när den ändras
+let titelTimeout = null
+document.getElementById('doc-title').addEventListener('input', () => {
+    if (!aktivtDokumentProjektId) return
+    clearTimeout(titelTimeout)
+    titelTimeout = setTimeout(async () => {
+        const titel = document.getElementById('doc-title').value
+        await sparaDokument(aktivtDokumentProjektId, editor.getHTML(), titel)
+    }, 1000)
+})
+
 // Chatt
 let chattHistorik = []
 let aktivtProjektData = null
