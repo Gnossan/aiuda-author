@@ -37,6 +37,7 @@ app.innerHTML = `
         <span id="word-count">0 ord</span>
         <button id="open-btn" title="Öppna fil">↑</button>
         <input type="file" id="file-input" accept=".md,.txt,.wiki,.tex" style="display:none">
+        <button id="spara-btn" title="Spara nu (Cmd+S)" style="background:transparent;border:1px solid var(--border);color:var(--text);padding:4px 10px;border-radius:4px;cursor:pointer;font-family:'DM Mono',monospace;font-size:11px;opacity:0.6;transition:opacity 0.15s;" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0.6">💾</button>
         <button id="export-btn" title="Exportera">↓</button>
         <span id="user-info" style="font-size:11px;opacity:0.4;max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"></span>
         <button id="logout-btn" title="Logga ut" style="background:transparent;border:1px solid var(--border);color:var(--text);padding:4px 8px;border-radius:4px;cursor:pointer;font-family:'DM Mono',monospace;font-size:11px;opacity:0.4;transition:opacity 0.15s;" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0.4">↩</button>
@@ -385,6 +386,29 @@ if (sparadHöger) { const el = document.getElementById('right-panel'); if (el) {
 
 initResizer('resizer-left', document.getElementById('left-panel'), document.getElementById('editor-wrapper'), 'author-left-width')
 initResizer('resizer-right', document.getElementById('editor-wrapper'), document.getElementById('right-panel'), 'author-right-width')
+
+// Explicit spara-knapp
+async function sparaNu() {
+    if (!aktivtDokumentProjektId) return
+    const knapp = document.getElementById('spara-btn')
+    knapp.textContent = '⏳'
+    try {
+        const titel = document.getElementById('doc-title').value
+        await sparaDokument(aktivtDokumentProjektId, editor.getHTML(), titel)
+        knapp.textContent = '✓'
+        setTimeout(() => { knapp.textContent = '💾' }, 1500)
+    } catch {
+        knapp.textContent = '✗'
+        setTimeout(() => { knapp.textContent = '💾' }, 1500)
+    }
+}
+
+document.getElementById('spara-btn').addEventListener('click', sparaNu)
+
+// Cmd+S / Ctrl+S
+document.addEventListener('keydown', (e) => {
+    if ((e.metaKey || e.ctrlKey) && e.key === 's') { e.preventDefault(); sparaNu() }
+})
 
 // Spara titeln när den ändras
 let titelTimeout = null
