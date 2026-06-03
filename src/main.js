@@ -1,10 +1,12 @@
 import { skapaEditor, sättLäge } from './editor.js'
 import { htmlTillMarkdown, markdownTillHtml, htmlTillWiki, wikiTillHtml, htmlTillLatex, latexTillHtml } from './converter.js'
 import { auth, loggaIn, loggaUt, onAuth } from './auth.js'
-import { hämtaProjektlista, visaProjektPicker, säkerställNyckel, hämtaProjekt, genereraResearchSammanfattning, genereraDisposition, sparaAuthorData } from './mentor.js'
+import { hämtaProjektlista, visaProjektPicker, säkerställNyckel, hämtaProjekt, genereraResearchSammanfattning, genereraDisposition, sparaAuthorData, sparaDokument, laddaDokument } from './mentor.js'
 import './style.css'
 
 let aktivAnvändare = null
+let sparaTimeout = null
+let aktivtDokumentProjektId = null
 
 const app = document.getElementById('app')
 
@@ -91,6 +93,14 @@ let aktivVy = 'wysiwyg'
 const editor = skapaEditor(editorEl, (ed) => {
     const words = ed.getText().trim().split(/\s+/).filter(Boolean).length
     document.getElementById('word-count').textContent = `${words} ord`
+
+    // Auto-spara med 2 sekunders debounce
+    if (aktivtDokumentProjektId) {
+        clearTimeout(sparaTimeout)
+        sparaTimeout = setTimeout(async () => {
+            await sparaDokument(aktivtDokumentProjektId, ed.getHTML())
+        }, 2000)
+    }
 })
 
 // View-toggle WYSIWYG ↔ Source
@@ -236,9 +246,20 @@ document.getElementById('välj-projekt-btn').addEventListener('click', async () 
                 <div style="opacity:0.4;font-style:italic;">⏳ Genererar sammanfattning…</div>
             `
             let aktivtProjektId = valt.id
-            chattHistorik = [] // Återställ chatt vid projektbyte
+            aktivtDokumentProjektId = valt.id
+            chattHistorik = []
             document.getElementById('chatt-meddelanden').innerHTML = ''
             document.getElementById('chatt-sektion').style.display = 'flex'
+
+            // Ladda sparat dokument
+            try {
+                const sparadText = await laddaDokument(valt.id)
+                if (sparadText) {
+                    editor.commands.setContent(sparadText)
+                } else {
+                    editor.commands.clearContent()
+                }
+            } catch { editor.commands.clearContent() }
 
             function visaAuthorData(namn, fraga, sammanfattning, disposition, genererad) {
                 const disposEl = document.getElementById('disposition')

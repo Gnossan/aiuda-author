@@ -1,6 +1,6 @@
 import { db, auth } from './auth.js'
 import { collection, getDocs, doc, getDoc, setDoc, query, orderBy, limit } from 'firebase/firestore'
-import { hämtaNyckel, dekryptera, visaLösenordsDialog } from './crypto.js'
+import { hämtaNyckel, dekryptera, kryptera, visaLösenordsDialog } from './crypto.js'
 
 // Hämta och lås upp krypteringsnyckeln om behövs
 export async function säkerställNyckel() {
@@ -73,6 +73,25 @@ export async function hämtaProjekt(projektId) {
     }
 
     return { id: snap.id, historik, metadata, ...data }
+}
+
+// Spara och ladda studentens text (krypterat)
+export async function sparaDokument(projektId, html) {
+    const uid = auth.currentUser?.uid
+    if (!uid) return
+    const krypterat = await kryptera(html)
+    if (!krypterat) return
+    const ref = doc(db, 'users', uid, 'mentor_projekt', projektId)
+    await setDoc(ref, { authorDokument: krypterat, authorDokumentSparat: new Date().toISOString() }, { merge: true })
+}
+
+export async function laddaDokument(projektId) {
+    const uid = auth.currentUser?.uid
+    if (!uid) return null
+    const ref = doc(db, 'users', uid, 'mentor_projekt', projektId)
+    const snap = await getDoc(ref)
+    if (!snap.exists() || !snap.data().authorDokument) return null
+    return dekryptera(snap.data().authorDokument)
 }
 
 // Spara genererad sammanfattning och disposition till Firebase

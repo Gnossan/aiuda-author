@@ -39,6 +39,18 @@ export async function importeraNyckelMedLösenord(lösenord, nyckelData) {
     )
 }
 
+function bufferTillBase64(buffer) {
+    return btoa(String.fromCharCode(...new Uint8Array(buffer)))
+}
+
+export async function kryptera(obj) {
+    if (!krypteringsNyckel) return null
+    const iv = crypto.getRandomValues(new Uint8Array(12))
+    const data = new TextEncoder().encode(JSON.stringify(obj))
+    const krypterad = await crypto.subtle.encrypt({ name: 'AES-GCM', iv }, krypteringsNyckel, data)
+    return { data: bufferTillBase64(krypterad), iv: bufferTillBase64(iv) }
+}
+
 // Visa lösenordsdialog och returnera upplåst nyckel
 export function visaLösenordsDialog(wrappedKeyData) {
     return new Promise((resolve, reject) => {
