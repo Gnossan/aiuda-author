@@ -420,7 +420,7 @@ async function skickaChattmeddelande() {
     chattHistorik.push({ role: 'user', content: text })
 
     // Bygg kontext
-    const skrivyta = editor.getText().slice(0, 3000)
+    const skrivyta = htmlTillMarkdown(editor.getHTML()).slice(0, 4000)
     const disposition = document.getElementById('disposition')?.innerText?.slice(0, 1000) || ''
     const sammanfattning = document.getElementById('research-sammanfattning')?.innerText?.slice(0, 1000) || ''
 
