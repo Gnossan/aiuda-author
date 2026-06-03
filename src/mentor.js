@@ -1,0 +1,101 @@
+import { db, auth } from './auth.js'
+import { collection, getDocs, doc, getDoc, query, orderBy, limit } from 'firebase/firestore'
+
+// Hämta Mentor-projektlistan (metadata)
+export async function hämtaProjektlista() {
+    const uid = auth.currentUser?.uid
+    if (!uid) throw new Error('Ej inloggad')
+
+    const q = query(
+        collection(db, 'users', uid, 'mentor_projekt'),
+        orderBy('senastSparat', 'desc'),
+        limit(50)
+    )
+    const snap = await getDocs(q)
+    return snap.docs.map(d => ({
+        id: d.id,
+        namn: d.data().namn || '',
+        fraga: d.data().fraga || '',
+        krypteradMetadata: d.data().krypteradMetadata || null,
+        senastSparat: d.data().senastSparat?.toDate?.()?.toISOString() || null
+    }))
+}
+
+// Hämta ett specifikt projekt (krypterat innehåll)
+export async function hämtaProjekt(projektId) {
+    const uid = auth.currentUser?.uid
+    if (!uid) throw new Error('Ej inloggad')
+
+    const ref = doc(db, 'users', uid, 'mentor_projekt', projektId)
+    const snap = await getDoc(ref)
+    if (!snap.exists()) throw new Error('Projekt hittades inte')
+    return { id: snap.id, ...snap.data() }
+}
+
+// Visa projekt-picker dialog
+export function visaProjektPicker(projekt, onValt) {
+    const existing = document.getElementById('projekt-picker')
+    existing?.remove()
+
+    const dialog = document.createElement('div')
+    dialog.id = 'projekt-picker'
+    dialog.style.cssText = `
+        position: fixed; inset: 0; background: rgba(0,0,0,0.7);
+        z-index: 9999; display: flex; align-items: center; justify-content: center;
+    `
+
+    const box = document.createElement('div')
+    box.style.cssText = `
+        background: #211c14; border: 1px solid #444; border-radius: 10px;
+        padding: 24px; width: 440px; max-height: 70vh;
+        font-family: 'DM Mono', monospace; font-size: 12px; color: #f5f0e8;
+        display: flex; flex-direction: column; gap: 12px;
+    `
+
+    const rubrik = document.createElement('div')
+    rubrik.style.cssText = 'font-size: 14px; font-weight: 600; color: #f0c040;'
+    rubrik.textContent = 'Välj Mentor-projekt'
+
+    const lista = document.createElement('div')
+    lista.style.cssText = 'overflow-y: auto; max-height: 50vh; display: flex; flex-direction: column; gap: 6px;'
+
+    if (!projekt.length) {
+        lista.innerHTML = '<div style="opacity:0.5;padding:12px;">Inga projekt hittades.</div>'
+    } else {
+        projekt.forEach(p => {
+            const el = document.createElement('div')
+            el.style.cssText = `
+                padding: 10px 14px; border: 1px solid #333; border-radius: 6px;
+                cursor: pointer; transition: background 0.15s;
+            `
+            el.innerHTML = `
+                <div style="font-weight:600;margin-bottom:3px;color:#f0c040;">
+                    ${p.namn || p.fraga?.slice(0, 40) || p.id}
+                </div>
+                <div style="opacity:0.6;font-size:11px;">${p.fraga?.slice(0, 80) || ''}</div>
+            `
+            el.addEventListener('mouseover', () => el.style.background = 'rgba(240,192,64,0.08)')
+            el.addEventListener('mouseout', () => el.style.background = '')
+            el.addEventListener('click', () => {
+                dialog.remove()
+                onValt(p)
+            })
+            lista.appendChild(el)
+        })
+    }
+
+    const avbryt = document.createElement('button')
+    avbryt.textContent = 'Avbryt'
+    avbryt.style.cssText = `
+        padding: 8px; background: transparent; border: 1px solid #444;
+        border-radius: 5px; color: #f5f0e8; cursor: pointer;
+        font-family: 'DM Mono', monospace; font-size: 11px; opacity: 0.6;
+    `
+    avbryt.addEventListener('click', () => dialog.remove())
+
+    box.append(rubrik, lista, avbryt)
+    dialog.appendChild(box)
+    document.body.appendChild(dialog)
+
+    dialog.addEventListener('click', (e) => { if (e.target === dialog) dialog.remove() })
+}

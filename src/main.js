@@ -1,6 +1,7 @@
 import { skapaEditor, sättLäge } from './editor.js'
 import { htmlTillMarkdown, markdownTillHtml, htmlTillWiki, wikiTillHtml, htmlTillLatex, latexTillHtml } from './converter.js'
 import { loggaIn, loggaUt, onAuth } from './auth.js'
+import { hämtaProjektlista, visaProjektPicker } from './mentor.js'
 import './style.css'
 
 let aktivAnvändare = null
@@ -43,12 +44,22 @@ app.innerHTML = `
     </header>
 
     <main id="main">
-      <div class="page-margin"></div>
+      <div class="page-margin" id="left-panel"></div>
       <div id="editor-wrapper">
         <div id="editor"></div>
         <textarea id="source-view" style="display:none" spellcheck="false" placeholder="Skriv Markdown här…"></textarea>
       </div>
-      <div class="page-margin"></div>
+      <div class="page-margin" id="right-panel">
+        <div id="right-panel-content" style="padding:16px;height:100%;overflow-y:auto;">
+          <button id="välj-projekt-btn" style="
+            width:100%;padding:10px;background:rgba(240,192,64,0.1);
+            border:1px solid rgba(240,192,64,0.3);border-radius:6px;
+            color:#f0c040;font-family:'DM Mono',monospace;font-size:11px;
+            cursor:pointer;letter-spacing:0.05em;
+          ">＋ Välj Mentor-projekt</button>
+          <div id="research-sammanfattning" style="margin-top:12px;font-size:11px;line-height:1.7;opacity:0.8;"></div>
+        </div>
+      </div>
     </main>
   </div>
 `
@@ -189,6 +200,26 @@ document.getElementById('file-input').addEventListener('change', (e) => {
     }
     reader.readAsText(fil)
     e.target.value = '' // Tillåt att öppna samma fil igen
+})
+
+// Höger panel — Mentor-projekt
+document.getElementById('välj-projekt-btn').addEventListener('click', async () => {
+    try {
+        const projekt = await hämtaProjektlista()
+        visaProjektPicker(projekt, (valt) => {
+            document.getElementById('research-sammanfattning').innerHTML = `
+                <div style="color:#f0c040;font-weight:600;margin-bottom:8px;">
+                    ${valt.namn || valt.fraga?.slice(0,40) || valt.id}
+                </div>
+                <div style="opacity:0.5;font-size:10px;margin-bottom:12px;">${valt.fraga || ''}</div>
+                <div style="opacity:0.4;font-style:italic;">
+                    Låsa upp med lösenord för att generera sammanfattning…
+                </div>
+            `
+        })
+    } catch (e) {
+        console.error(e)
+    }
 })
 
 // Auth
