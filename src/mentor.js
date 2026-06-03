@@ -91,12 +91,19 @@ export async function genereraResearchSammanfattning(projekt, onChunk) {
         return 'Projektet har ingen chatthistorik att sammanfatta.'
     }
 
-    const prompt = `Du läser en research-session. Sammanfatta BARA det som faktiskt finns i konversationen.
+    const systemprompt = `Du är en research-assistent som hjälper studenter sammanfatta sin research.`
 
+    const sammanfattningsFraga = `Sammanfatta BARA det som faktiskt finns i den här research-konversationen.
 Möjliga avsnitt: frågeställning, bakgrund, metod, material, resultat, diskussion, slutsats.
-Inkludera BARA de avsnitt som faktiskt framgår av konversationen — fabricera inget.
-Om ett avsnitt saknas, hoppa över det. Skriv på samma språk som konversationen.
-Håll det koncist — max 3-4 meningar per avsnitt.`
+Inkludera BARA avsnitt som faktiskt framgår — fabricera inget.
+Om ett avsnitt saknas, hoppa över det helt.
+Skriv på samma språk som konversationen. Max 3-4 meningar per avsnitt.`
+
+    // Sammanfattningsfrågan läggs till som sista user-meddelande
+    const historikMedFraga = [
+        ...synligHistorik,
+        { role: 'user', content: sammanfattningsFraga }
+    ]
 
     let resp
     try {
@@ -107,8 +114,8 @@ Håll det koncist — max 3-4 meningar per avsnitt.`
                 'Authorization': `Bearer ${token}`
             },
             body: JSON.stringify({
-                historik: synligHistorik,
-                systemprompt: prompt,
+                historik: historikMedFraga,
+                systemprompt,
                 model: 'claude-sonnet-4-6'
             })
         })
