@@ -77,6 +77,55 @@ export async function hämtaProjekt(projektId) {
 
 const MENTOR_BACKEND = 'https://aiuda-mentor-backend.vercel.app'
 
+// Generera disposition via AI
+export async function genereraDisposition(projekt) {
+    const token = await auth.currentUser?.getIdToken()
+    if (!token) throw new Error('Ej inloggad')
+
+    const synligHistorik = (projekt.historik || [])
+        .filter(m => !m.silent && typeof m.content === 'string')
+        .slice(-40)
+
+    if (!synligHistorik.length) return null
+
+    const systemprompt = `Du är en research-assistent som hjälper studenter strukturera sitt skrivande.`
+
+    const dispositionsFraga = `Baserat på den här research-konversationen, skapa en disposition för en akademisk text.
+
+Använd bara det som faktiskt finns i researchen — ingen fabricering.
+Format: rubriker (##) med bullet points (-) under varje.
+Om ett avsnitt saknas i researchen, ta inte med det.
+Skriv på samma språk som konversationen.
+Håll det koncist — max 3-4 bullets per rubrik.`
+
+    const historikMedFraga = [
+        ...synligHistorik,
+        { role: 'user', content: dispositionsFraga }
+    ]
+
+    let resp
+    try {
+        resp = await fetch(`${MENTOR_BACKEND}/api/chat`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({
+                historik: historikMedFraga,
+                systemprompt,
+                model: 'claude-sonnet-4-6'
+            })
+        })
+    } catch (e) {
+        throw new Error(`Nätverksfel: ${e.message}`)
+    }
+
+    if (!resp.ok) throw new Error(`Backendfel: ${resp.status}`)
+    const data = await resp.json()
+    return data.result?.content?.[0]?.text || null
+}
+
 // Generera research-sammanfattning via AI
 export async function genereraResearchSammanfattning(projekt, onChunk) {
     const token = await auth.currentUser?.getIdToken()

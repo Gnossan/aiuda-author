@@ -1,7 +1,7 @@
 import { skapaEditor, sättLäge } from './editor.js'
 import { htmlTillMarkdown, markdownTillHtml, htmlTillWiki, wikiTillHtml, htmlTillLatex, latexTillHtml } from './converter.js'
 import { loggaIn, loggaUt, onAuth } from './auth.js'
-import { hämtaProjektlista, visaProjektPicker, säkerställNyckel, hämtaProjekt, genereraResearchSammanfattning } from './mentor.js'
+import { hämtaProjektlista, visaProjektPicker, säkerställNyckel, hämtaProjekt, genereraResearchSammanfattning, genereraDisposition } from './mentor.js'
 import './style.css'
 
 let aktivAnvändare = null
@@ -44,7 +44,14 @@ app.innerHTML = `
     </header>
 
     <main id="main">
-      <div class="page-margin" id="left-panel"></div>
+      <div class="page-margin" id="left-panel">
+        <div id="left-panel-content" style="padding:16px;height:100%;overflow-y:auto;display:flex;flex-direction:column;gap:12px;">
+          <div style="font-size:10px;opacity:0.4;letter-spacing:0.1em;text-transform:uppercase;">Disposition</div>
+          <div id="disposition" style="font-size:11px;line-height:1.8;opacity:0.7;">
+            <span style="opacity:0.4;font-style:italic;">Välj ett Mentor-projekt för att generera disposition.</span>
+          </div>
+        </div>
+      </div>
       <div id="editor-wrapper">
         <div id="editor"></div>
         <textarea id="source-view" style="display:none" spellcheck="false" placeholder="Skriv Markdown här…"></textarea>
@@ -218,7 +225,15 @@ document.getElementById('välj-projekt-btn').addEventListener('click', async () 
             `
             try {
                 const projektData = await hämtaProjekt(valt.id)
-                const sammanfattning = await genereraResearchSammanfattning(projektData)
+                const disposEl = document.getElementById('disposition')
+                disposEl.innerHTML = '<span style="opacity:0.4;font-style:italic;">⏳ Genererar disposition…</span>'
+
+                // Kör sammanfattning och disposition parallellt
+                const [sammanfattning, disposition] = await Promise.all([
+                    genereraResearchSammanfattning(projektData),
+                    genereraDisposition(projektData)
+                ])
+
                 sammanfattEl.innerHTML = `
                     <div style="color:#f0c040;font-weight:600;margin-bottom:8px;">
                         ${valt.namn || valt.fraga?.slice(0,40) || valt.id}
@@ -226,6 +241,13 @@ document.getElementById('välj-projekt-btn').addEventListener('click', async () 
                     <div style="opacity:0.5;font-size:10px;margin-bottom:12px;">${valt.fraga || ''}</div>
                     <div style="line-height:1.8;white-space:pre-wrap;">${sammanfattning}</div>
                 `
+
+                if (disposition) {
+                    // Rendera disposition som Markdown
+                    disposEl.innerHTML = markdownTillHtml(disposition)
+                } else {
+                    disposEl.innerHTML = '<span style="opacity:0.4;font-style:italic;">Ingen disposition kunde genereras.</span>'
+                }
             } catch (e) {
                 sammanfattEl.innerHTML += `<div style="color:#ff6b6b;margin-top:8px;">Fel: ${e.message}</div>`
             }
