@@ -14,6 +14,7 @@
     "@tiptap/pm": "latest",
     "@tiptap/starter-kit": "latest",
     "@tiptap/suggestion": "^3.24.0",
+    "firebase": "^12.14.0",
     "marked": "^18.0.4",
     "turndown": "^7.2.4"
   },

@@ -1,11 +1,20 @@
 import { skapaEditor, sättLäge } from './editor.js'
 import { htmlTillMarkdown, markdownTillHtml, htmlTillWiki, wikiTillHtml, htmlTillLatex, latexTillHtml } from './converter.js'
+import { loggaIn, loggaUt, onAuth } from './auth.js'
 import './style.css'
+
+let aktivAnvändare = null
 
 const app = document.getElementById('app')
 
 app.innerHTML = `
-  <div id="layout">
+  <div id="login-vy" style="display:none;position:fixed;inset:0;background:var(--bg);z-index:9999;flex-direction:column;align-items:center;justify-content:center;gap:24px;">
+    <div style="font-size:32px;font-weight:500;letter-spacing:-0.02em;">AI<span style="color:#f0c040;">u</span>da Author<sup style="font-size:12px;opacity:0.5;vertical-align:super;">™</sup></div>
+    <div style="font-size:13px;opacity:0.5;letter-spacing:0.1em;text-transform:uppercase;">Write deeper. Structure better.</div>
+    <button id="login-btn" style="padding:12px 28px;background:#f0c040;color:#1a1610;border:none;border-radius:6px;cursor:pointer;font-family:'DM Mono',monospace;font-size:13px;font-weight:600;margin-top:16px;">Logga in med Google →</button>
+  </div>
+
+  <div id="layout" style="display:none">
     <header id="topbar">
       <div id="topbar-left">
         <span class="logo">AI<span class="accent">u</span>da Author<sup class="tm">™</sup></span>
@@ -28,6 +37,8 @@ app.innerHTML = `
         <button id="open-btn" title="Öppna fil">↑</button>
         <input type="file" id="file-input" accept=".md,.txt,.wiki,.tex" style="display:none">
         <button id="export-btn" title="Exportera">↓</button>
+        <span id="user-info" style="font-size:11px;opacity:0.4;max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"></span>
+        <button id="logout-btn" title="Logga ut" style="background:transparent;border:1px solid var(--border);color:var(--text);padding:4px 8px;border-radius:4px;cursor:pointer;font-family:'DM Mono',monospace;font-size:11px;opacity:0.4;transition:opacity 0.15s;" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0.4">↩</button>
       </div>
     </header>
 
@@ -179,6 +190,26 @@ document.getElementById('file-input').addEventListener('change', (e) => {
     reader.readAsText(fil)
     e.target.value = '' // Tillåt att öppna samma fil igen
 })
+
+// Auth
+onAuth((user) => {
+    aktivAnvändare = user
+    const loginVy = document.getElementById('login-vy')
+    const layout = document.getElementById('layout')
+    const userInfo = document.getElementById('user-info')
+
+    if (user) {
+        loginVy.style.display = 'none'
+        layout.style.display = 'flex'
+        if (userInfo) userInfo.textContent = user.displayName || user.email
+    } else {
+        loginVy.style.display = 'flex'
+        layout.style.display = 'none'
+    }
+})
+
+document.getElementById('login-btn')?.addEventListener('click', loggaIn)
+document.getElementById('logout-btn')?.addEventListener('click', loggaUt)
 
 // Export
 document.getElementById('export-btn').addEventListener('click', () => {
