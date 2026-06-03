@@ -49,7 +49,7 @@ export async function hämtaProjektlista() {
     return projekt
 }
 
-// Hämta ett specifikt projekt (krypterat innehåll)
+// Hämta och dekryptera ett specifikt projekt
 export async function hämtaProjekt(projektId) {
     const uid = auth.currentUser?.uid
     if (!uid) throw new Error('Ej inloggad')
@@ -57,7 +57,63 @@ export async function hämtaProjekt(projektId) {
     const ref = doc(db, 'users', uid, 'mentor_projekt', projektId)
     const snap = await getDoc(ref)
     if (!snap.exists()) throw new Error('Projekt hittades inte')
-    return { id: snap.id, ...snap.data() }
+
+    const data = snap.data()
+    const nyckel = hämtaNyckel()
+    let historik = []
+    let metadata = {}
+
+    if (nyckel) {
+        if (data.krypteradHistorik) {
+            historik = await dekryptera(data.krypteradHistorik) || []
+        }
+        if (data.krypteradMetadata) {
+            metadata = await dekryptera(data.krypteradMetadata) || {}
+        }
+    }
+
+    return { id: snap.id, historik, metadata, ...data }
+}
+
+const MENTOR_BACKEND = 'https://aiuda-mentor-backend.vercel.app'
+
+// Generera research-sammanfattning via AI
+export async function genereraResearchSammanfattning(projekt, onChunk) {
+    const token = await auth.currentUser?.getIdToken()
+    if (!token) throw new Error('Ej inloggad')
+
+    // Bygg kontext från historiken
+    const synligHistorik = (projekt.historik || [])
+        .filter(m => !m.silent && typeof m.content === 'string')
+        .slice(-40) // Max 40 meddelanden
+
+    if (!synligHistorik.length) {
+        return 'Projektet har ingen chatthistorik att sammanfatta.'
+    }
+
+    const prompt = `Du läser en research-session. Sammanfatta BARA det som faktiskt finns i konversationen.
+
+Möjliga avsnitt: frågeställning, bakgrund, metod, material, resultat, diskussion, slutsats.
+Inkludera BARA de avsnitt som faktiskt framgår av konversationen — fabricera inget.
+Om ett avsnitt saknas, hoppa över det. Skriv på samma språk som konversationen.
+Håll det koncist — max 3-4 meningar per avsnitt.`
+
+    const resp = await fetch(`${MENTOR_BACKEND}/api/chat`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+            historik: synligHistorik,
+            systemprompt: prompt,
+            model: 'claude-sonnet-4-6'
+        })
+    })
+
+    if (!resp.ok) throw new Error(`AI-fel: ${resp.status}`)
+    const data = await resp.json()
+    return data.result?.content?.[0]?.text || 'Kunde inte generera sammanfattning.'
 }
 
 // Visa projekt-picker dialog

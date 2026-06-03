@@ -1,7 +1,7 @@
 import { skapaEditor, sättLäge } from './editor.js'
 import { htmlTillMarkdown, markdownTillHtml, htmlTillWiki, wikiTillHtml, htmlTillLatex, latexTillHtml } from './converter.js'
 import { loggaIn, loggaUt, onAuth } from './auth.js'
-import { hämtaProjektlista, visaProjektPicker, säkerställNyckel } from './mentor.js'
+import { hämtaProjektlista, visaProjektPicker, säkerställNyckel, hämtaProjekt, genereraResearchSammanfattning } from './mentor.js'
 import './style.css'
 
 let aktivAnvändare = null
@@ -207,16 +207,28 @@ document.getElementById('välj-projekt-btn').addEventListener('click', async () 
     try {
         await säkerställNyckel()
         const projekt = await hämtaProjektlista()
-        visaProjektPicker(projekt, (valt) => {
-            document.getElementById('research-sammanfattning').innerHTML = `
+        visaProjektPicker(projekt, async (valt) => {
+            const sammanfattEl = document.getElementById('research-sammanfattning')
+            sammanfattEl.innerHTML = `
                 <div style="color:#f0c040;font-weight:600;margin-bottom:8px;">
                     ${valt.namn || valt.fraga?.slice(0,40) || valt.id}
                 </div>
                 <div style="opacity:0.5;font-size:10px;margin-bottom:12px;">${valt.fraga || ''}</div>
-                <div style="opacity:0.4;font-style:italic;">
-                    Låsa upp med lösenord för att generera sammanfattning…
-                </div>
+                <div style="opacity:0.4;font-style:italic;">⏳ Genererar sammanfattning…</div>
             `
+            try {
+                const projektData = await hämtaProjekt(valt.id)
+                const sammanfattning = await genereraResearchSammanfattning(projektData)
+                sammanfattEl.innerHTML = `
+                    <div style="color:#f0c040;font-weight:600;margin-bottom:8px;">
+                        ${valt.namn || valt.fraga?.slice(0,40) || valt.id}
+                    </div>
+                    <div style="opacity:0.5;font-size:10px;margin-bottom:12px;">${valt.fraga || ''}</div>
+                    <div style="line-height:1.8;white-space:pre-wrap;">${sammanfattning}</div>
+                `
+            } catch (e) {
+                sammanfattEl.innerHTML += `<div style="color:#ff6b6b;margin-top:8px;">Fel: ${e.message}</div>`
+            }
         })
     } catch (e) {
         console.error(e)
