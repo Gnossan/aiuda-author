@@ -1,6 +1,6 @@
 import { skapaEditor, sättLäge } from './editor.js'
 import { htmlTillMarkdown, markdownTillHtml, htmlTillWiki, wikiTillHtml, htmlTillLatex, latexTillHtml } from './converter.js'
-import { loggaIn, loggaUt, onAuth } from './auth.js'
+import { auth, loggaIn, loggaUt, onAuth } from './auth.js'
 import { hämtaProjektlista, visaProjektPicker, säkerställNyckel, hämtaProjekt, genereraResearchSammanfattning, genereraDisposition, sparaAuthorData } from './mentor.js'
 import './style.css'
 
