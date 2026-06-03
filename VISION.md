@@ -106,6 +106,32 @@ Läraren kan begära loggen för att se hur AI användes i uppsatsen. Det bygger
 
 ---
 
+## Opponenten
+
+En AI-opponent som på begäran granskar arbetet kritiskt — inte för att skriva om det, utan för att hitta svagheter.
+
+### Uppgift
+Opponenten har tillgång till samma Mentor-projekt som skrivarbetet bygger på och kan:
+- Identifiera var det **pågående skrivarbetet** behöver åtgärdas (logikbrister, glapp, ej täckt av research)
+- Hitta svagheter i **frågeställning** (för bred, för smal, oklar)
+- Granska **metod** (håller den för det den påstår?)
+- Ifrågasätta **resultat** (stöds de av underlaget?)
+- Utmana **slutsats** (är den välgrundad? Fabriceras något?)
+- Peka på **intern inkonsekvens** — påståenden som motsäger varandra
+
+Opponenten ger aldrig färdiga omformuleringar. Den ställer frågor och pekar ut problemen — studenten löser dem.
+
+### Tillgång
+Samma åtkomstmodell som övrig AI:
+- Läsåtkomst till skrivytan
+- Läs-/skrivåtkomst till vänster panel (feedback visas där)
+- Åtkomst till Mentor-projektet för att jämföra research mot text
+
+### Status lights (idé — ej beslutad)
+Möjlig visuell indikator per avsnitt i texten — grön/gul/röd baserat på opponentens bedömning. Kräver genomtänkt UX för att inte uppmuntra "jaga grönt" istället för kritiskt tänkande.
+
+---
+
 ## Roadmap — på begäran
 
 Funktioner som inte är med i MVP men som kan läggas till vid efterfrågan:
