@@ -107,6 +107,16 @@ body {
 }
 #bg-btn:hover { opacity: 1; }
 
+/* Sidpanel-text — kompakt, inga stora rubriker */
+.panel-text {
+  font-size: 11px;
+  line-height: 1.7;
+  white-space: pre-wrap;
+  font-family: var(--font-ui);
+  opacity: 0.8;
+  margin: 0;
+}
+
 /* Source-vy */
 #source-view {
   width: 100%;

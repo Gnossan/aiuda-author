@@ -239,12 +239,11 @@ document.getElementById('välj-projekt-btn').addEventListener('click', async () 
                         ${valt.namn || valt.fraga?.slice(0,40) || valt.id}
                     </div>
                     <div style="opacity:0.5;font-size:10px;margin-bottom:12px;">${valt.fraga || ''}</div>
-                    <div style="line-height:1.8;">${markdownTillHtml(sammanfattning)}</div>
+                    <pre class="panel-text">${sammanfattning}</pre>
                 `
 
                 if (disposition) {
-                    // Rendera disposition som Markdown
-                    disposEl.innerHTML = markdownTillHtml(disposition)
+                    disposEl.innerHTML = `<pre class="panel-text">${disposition}</pre>`
                 } else {
                     disposEl.innerHTML = '<span style="opacity:0.4;font-style:italic;">Ingen disposition kunde genereras.</span>'
                 }
