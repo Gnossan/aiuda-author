@@ -25,8 +25,8 @@ app.innerHTML = `
       <div id="topbar-center"></div>
       <div id="topbar-right">
         <div id="view-toggle">
-          <button class="view-btn active" data-view="wysiwyg">WYSIWYG</button>
-          <button class="view-btn" data-view="source">Source</button>
+          <button class="view-btn" data-view="wysiwyg">WYSIWYG</button>
+          <button class="view-btn active" data-view="source">Source</button>
         </div>
         <div id="format-toggle">
           <button class="format-btn active" data-format="md">MD</button>
@@ -95,13 +95,16 @@ app.innerHTML = `
 // Starta editorn
 const editorEl = document.getElementById('editor')
 const sourceEl = document.getElementById('source-view')
-let aktivVy = 'wysiwyg'
+let aktivVy = 'source'
+
+// Starta i source-vy (Markdown är default)
+editorEl.style.display = 'none'
+sourceEl.style.display = 'block'
 
 const editor = skapaEditor(editorEl, (ed) => {
     const words = ed.getText().trim().split(/\s+/).filter(Boolean).length
     document.getElementById('word-count').textContent = `${words} ord`
 
-    // Auto-spara med 2 sekunders debounce
     if (aktivtDokumentProjektId) {
         clearTimeout(sparaTimeout)
         sparaTimeout = setTimeout(async () => {
@@ -109,6 +112,25 @@ const editor = skapaEditor(editorEl, (ed) => {
             await sparaDokument(aktivtDokumentProjektId, ed.getHTML(), titel)
         }, 2000)
     }
+})
+
+function hämtaAktivtHtml() {
+    if (aktivVy === 'source') {
+        const text = sourceEl.value
+        return aktivtFormat === 'wiki' ? wikiTillHtml(text)
+             : aktivtFormat === 'latex' ? latexTillHtml(text)
+             : markdownTillHtml(text)
+    }
+    return editor.getHTML()
+}
+
+sourceEl.addEventListener('input', () => {
+    if (!aktivtDokumentProjektId) return
+    clearTimeout(sparaTimeout)
+    sparaTimeout = setTimeout(async () => {
+        const titel = document.getElementById('doc-title').value
+        await sparaDokument(aktivtDokumentProjektId, hämtaAktivtHtml(), titel)
+    }, 2000)
 })
 
 // View-toggle WYSIWYG ↔ Source
@@ -275,10 +297,15 @@ async function öppnaProjekt(valt) {
                 if (sparat) {
                     editor.commands.setContent(sparat.html)
                     if (sparat.titel) document.getElementById('doc-title').value = sparat.titel
+                    if (aktivVy === 'source') {
+                        sourceEl.value = htmlTillMarkdown(sparat.html)
+                    }
                 } else {
                     editor.commands.clearContent()
                     document.getElementById('doc-title').value = ''
+                    if (aktivVy === 'source') sourceEl.value = ''
                 }
+                clearTimeout(sparaTimeout)
             } catch { editor.commands.clearContent() }
 
             function visaAuthorData(namn, fraga, sammanfattning, disposition, genererad) {
@@ -394,7 +421,7 @@ async function sparaNu() {
     knapp.textContent = '⏳'
     try {
         const titel = document.getElementById('doc-title').value
-        await sparaDokument(aktivtDokumentProjektId, editor.getHTML(), titel)
+        await sparaDokument(aktivtDokumentProjektId, hämtaAktivtHtml(), titel)
         knapp.textContent = '✓'
         setTimeout(() => { knapp.textContent = '💾' }, 1500)
     } catch {
@@ -410,16 +437,7 @@ document.addEventListener('keydown', (e) => {
     if ((e.metaKey || e.ctrlKey) && e.key === 's') { e.preventDefault(); sparaNu() }
 })
 
-// Spara titeln när den ändras
-let titelTimeout = null
-document.getElementById('doc-title').addEventListener('input', () => {
-    if (!aktivtDokumentProjektId) return
-    clearTimeout(titelTimeout)
-    titelTimeout = setTimeout(async () => {
-        const titel = document.getElementById('doc-title').value
-        await sparaDokument(aktivtDokumentProjektId, editor.getHTML(), titel)
-    }, 1000)
-})
+// Titel-ändringar sparas via content auto-save (sourceEl/editor onUpdate)
 
 // Chatt
 let chattHistorik = []
@@ -444,7 +462,7 @@ async function skickaChattmeddelande() {
     chattHistorik.push({ role: 'user', content: text })
 
     // Bygg kontext
-    const skrivyta = htmlTillMarkdown(editor.getHTML()).slice(0, 4000)
+    const skrivyta = htmlTillMarkdown(hämtaAktivtHtml()).slice(0, 4000)
     const disposition = document.getElementById('disposition')?.innerText?.slice(0, 1000) || ''
     const sammanfattning = document.getElementById('research-sammanfattning')?.innerText?.slice(0, 1000) || ''
 

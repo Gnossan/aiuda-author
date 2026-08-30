@@ -103,10 +103,8 @@ export async function laddaDokument(projektId) {
     const snap = await getDoc(ref)
     if (!snap.exists()) { console.warn('laddaDokument: dokument finns inte'); return null }
     const snapData = snap.data()
-    if (!snapData.authorDokument) { console.warn('laddaDokument: authorDokument saknas'); return null }
-    console.log('laddaDokument: dekrypterar...')
+    if (!snapData.authorDokument) return null
     const data = await dekryptera(snapData.authorDokument)
-    console.log('laddaDokument: data typ:', typeof data, 'värde:', data ? JSON.stringify(data).slice(0, 100) : 'null')
     if (!data) return null
     if (typeof data === 'string') return { html: data, titel: '' }
     return data
@@ -229,11 +227,7 @@ Skriv på samma språk som konversationen. Max 3-4 meningar per avsnitt.`
         throw new Error(`Backendfel ${resp.status}: ${text.slice(0, 100)}`)
     }
     const data = await resp.json()
-    console.log('Historik-längd:', synligHistorik.length)
-    console.log('data.error:', data.error)
-    console.log('data.result type:', typeof data.result)
-    console.log('data.result.content:', JSON.stringify(data.result?.content)?.slice(0, 200))
-    return data.result?.content?.[0]?.text || `Svar saknas. error=${data.error} result=${JSON.stringify(data.result)?.slice(0,100)}`
+    return data.result?.content?.[0]?.text || null
 }
 
 // Visa projekt-picker dialog
